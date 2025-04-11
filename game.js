@@ -3,28 +3,19 @@ const tgWebApp = window.Telegram && window.Telegram.WebApp;
 
 // Инициализация WebApp
 if (tgWebApp) {
+    tgWebApp.ready();
     tgWebApp.expand();
-    tgWebApp.enableClosingConfirmation();
     
     // Адаптация цветов под Telegram
     document.documentElement.style.setProperty('--primary-color', '#0088cc');
-    document.documentElement.style.setProperty('--secondary-color', '#00aced');
-    document.documentElement.style.setProperty('--accent-color', '#ff6b81');
+    document.documentElement.style.setProperty('--secondary-color', '#3ac0ef');
 }
-
-// Конфигурация анимаций
-const ANIMATION_CONFIG = {
-    tileMove: 150, // ms
-    tilePress: 100, // ms
-    winCelebration: 300 // ms
-};
 
 // Игровые переменные
 let board = [];
 let emptyPos = { row: 3, col: 3 };
 let moves = 0;
 let gameStarted = false;
-let isAnimating = false;
 
 // DOM элементы
 const boardElement = document.getElementById('board');
@@ -77,7 +68,7 @@ function isSolvable(numbers) {
     return inversions % 2 === 0;
 }
 
-// Рендер доски с анимациями
+// Рендер доски
 function renderBoard() {
     movesElement.textContent = moves;
     boardElement.innerHTML = '';
@@ -90,10 +81,6 @@ function renderBoard() {
             if (value !== 0) {
                 tile.textContent = value;
                 tile.addEventListener('click', () => handleTileClick(i, j));
-                
-                // Плавное появление
-                tile.style.animation = `tileAppear ${ANIMATION_CONFIG.tileMove}ms ease-out`;
-                tile.style.animationDelay = `${(i * 4 + j) * 20}ms`;
             }
             
             boardElement.appendChild(tile);
@@ -105,31 +92,15 @@ function renderBoard() {
 
 // Обработка клика
 function handleTileClick(row, col) {
-    if (!gameStarted || isAnimating || !isAdjacent(row, col, emptyPos.row, emptyPos.col)) return;
+    if (!gameStarted || !isAdjacent(row, col, emptyPos.row, emptyPos.col)) return;
     
-    isAnimating = true;
-    const tile = document.querySelector(`.tile:nth-child(${row * 4 + col + 1})`);
+    // Обновляем состояние
+    board[emptyPos.row][emptyPos.col] = board[row][col];
+    board[row][col] = 0;
+    emptyPos = { row, col };
+    moves++;
     
-    // Анимация нажатия
-    tile.style.transform = 'scale(0.92)';
-    tile.style.transition = `transform ${ANIMATION_CONFIG.tilePress}ms ease`;
-    
-    setTimeout(() => {
-        // Обновляем состояние
-        board[emptyPos.row][emptyPos.col] = board[row][col];
-        board[row][col] = 0;
-        emptyPos = { row, col };
-        moves++;
-        
-        // Анимация перемещения
-        tile.style.transform = 'translate3d(0, 0, 0)';
-        tile.style.transition = `transform ${ANIMATION_CONFIG.tileMove}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-        
-        setTimeout(() => {
-            renderBoard();
-            isAnimating = false;
-        }, ANIMATION_CONFIG.tileMove);
-    }, ANIMATION_CONFIG.tilePress);
+    renderBoard();
 }
 
 // Проверка соседства
@@ -157,22 +128,11 @@ function checkWin() {
     if (isWin && gameStarted) {
         gameStarted = false;
         messageElement.textContent = `Победа! Ходов: ${moves}`;
-        celebrateWin();
         
         if (tgWebApp) {
             tgWebApp.sendData(`Победа за ${moves} ходов!`);
         }
     }
-}
-
-// Анимация победы
-function celebrateWin() {
-    const tiles = document.querySelectorAll('.tile:not(.empty)');
-    
-    tiles.forEach((tile, i) => {
-        tile.style.animation = `celebrate ${ANIMATION_CONFIG.winCelebration}ms cubic-bezier(0.68, -0.6, 0.32, 1.6) both`;
-        tile.style.animationDelay = `${i * 50}ms`;
-    });
 }
 
 // Инициализация
