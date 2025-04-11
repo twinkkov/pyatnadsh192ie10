@@ -1,0 +1,15 @@
+{
+  "name": "pyatnadsh192ie10",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tma.js/sdk": "^2.7.0"
+  }
+}
