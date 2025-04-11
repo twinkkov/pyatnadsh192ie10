@@ -5,14 +5,15 @@ const tgWebApp = window.Telegram && window.Telegram.WebApp;
 if (tgWebApp) {
     tgWebApp.ready();
     tgWebApp.expand();
-    
-    // Адаптация цветов под Telegram
     document.documentElement.style.setProperty('--primary-color', '#0088cc');
     document.documentElement.style.setProperty('--secondary-color', '#3ac0ef');
 }
 
-// Константы
-const MOVE_ANIMATION_DURATION = 200;
+// Настройки анимации
+const ANIMATION = {
+    duration: 300,
+    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+};
 
 // Состояние игры
 let board = [];
@@ -20,7 +21,7 @@ let emptyPos = { row: 3, col: 3 };
 let moves = 0;
 let gameStarted = false;
 let isAnimating = false;
-let tileElements = [];
+let tiles = [];
 
 // DOM элементы
 const boardElement = document.getElementById('board');
@@ -33,7 +34,6 @@ function initGame() {
     // Создаем и перемешиваем числа
     let numbers = Array.from({ length: 15 }, (_, i) => i + 1);
     
-    // Гарантированно решаемая перестановка
     do {
         for (let i = numbers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -59,10 +59,9 @@ function initGame() {
     moves = 0;
     gameStarted = true;
     messageElement.textContent = '';
-    renderInitialBoard();
+    renderBoard();
 }
 
-// Проверка решаемости
 function isSolvable(numbers) {
     let inversions = 0;
     for (let i = 0; i < numbers.length; i++) {
@@ -73,37 +72,9 @@ function isSolvable(numbers) {
     return inversions % 2 === 0;
 }
 
-// Рендер начальной доски
-function renderInitialBoard() {
-    boardElement.innerHTML = '';
-    tileElements = [];
-
-    board.forEach((row, i) => {
-        row.forEach((value, j) => {
-            const tile = document.createElement('div');
-            tile.className = value === 0 ? 'tile empty' : 'tile';
-            tile.dataset.row = i;
-            tile.dataset.col = j;
-
-            if (value !== 0) {
-                tile.textContent = value;
-                tile.addEventListener('click', () => handleTileClick(i, j));
-
-                // Анимация появления
-                tile.style.animation = `tileAppear ${MOVE_ANIMATION_DURATION}ms ease-out`;
-                tile.style.animationDelay = `${(i * 4 + j) * 30}ms`;
-            }
-
-            boardElement.appendChild(tile);
-            tileElements.push(tile);
-        });
-    });
-}
-
-// Рендер доски
 function renderBoard() {
-    movesElement.textContent = moves;
     boardElement.innerHTML = '';
+    tiles = [];
     
     board.forEach((row, i) => {
         row.forEach((value, j) => {
@@ -112,67 +83,73 @@ function renderBoard() {
             
             if (value !== 0) {
                 tile.textContent = value;
+                tile.dataset.row = i;
+                tile.dataset.col = j;
                 tile.addEventListener('click', () => handleTileClick(i, j));
+                tile.style.animation = `tileAppear 0.3s ease ${(i * 4 + j) * 0.05}s both`;
             }
             
             boardElement.appendChild(tile);
+            tiles.push(tile);
         });
     });
-    
-    checkWin();
 }
 
-// Обработка клика с анимацией
 function handleTileClick(row, col) {
-    if (!gameStarted || isAnimating || !isAdjacent(row, col, emptyPos.row, emptyPos.col)) return;
-
+    if (!gameStarted || isAnimating || !canMove(row, col)) return;
+    
     isAnimating = true;
-    const movingTile = tileElements.find(t => 
+    const tile = getTileAt(row, col);
+    const emptyTile = getTileAt(emptyPos.row, emptyPos.col);
+    
+    // Сохраняем начальные позиции
+    const startRow = row;
+    const startCol = col;
+    
+    // Обновляем состояние доски
+    board[emptyPos.row][emptyPos.col] = board[row][col];
+    board[row][col] = 0;
+    
+    // Анимация перемещения
+    tile.style.transition = `all ${ANIMATION.duration}ms ${ANIMATION.easing}`;
+    tile.style.transform = `translate(${(emptyPos.col - col) * 100}%, ${(emptyPos.row - row) * 100}%)`;
+    tile.style.zIndex = '10';
+    
+    setTimeout(() => {
+        // Обновляем DOM
+        tile.style.transform = 'translate(0, 0)';
+        tile.dataset.row = emptyPos.row;
+        tile.dataset.col = emptyPos.col;
+        
+        // Обновляем позицию пустой клетки
+        emptyPos = { row: startRow, col: startCol };
+        
+        moves++;
+        movesElement.textContent = moves;
+        
+        setTimeout(() => {
+            tile.style.transition = '';
+            tile.style.zIndex = '';
+            isAnimating = false;
+            checkWin();
+        }, ANIMATION.duration);
+    }, ANIMATION.duration);
+}
+
+function getTileAt(row, col) {
+    return tiles.find(t => 
         parseInt(t.dataset.row) === row && 
         parseInt(t.dataset.col) === col
     );
-
-    // Рассчитываем направление движения
-    const direction = {
-        x: emptyPos.col - col,
-        y: emptyPos.row - row
-    };
-
-    // Применяем анимацию
-    movingTile.style.transition = `transform ${MOVE_ANIMATION_DURATION}ms cubic-bezier(0.34, 1.56, 0.64, 1)`;
-    movingTile.style.transform = `translate(${direction.x * 100}%, ${direction.y * 100}%)`;
-    movingTile.style.zIndex = '10';
-
-    setTimeout(() => {
-        // Обновляем данные
-        board[emptyPos.row][emptyPos.col] = board[row][col];
-        board[row][col] = 0;
-
-        // Обновляем DOM без перерисовки
-        movingTile.style.transform = 'translate(0, 0)';
-        movingTile.style.zIndex = '';
-        movingTile.dataset.row = emptyPos.row;
-        movingTile.dataset.col = emptyPos.col;
-
-        emptyPos = { row, col };
-        moves++;
-        movesElement.textContent = moves;
-
-        setTimeout(() => {
-            movingTile.style.transition = '';
-            isAnimating = false;
-            checkWin();
-        }, MOVE_ANIMATION_DURATION);
-    }, MOVE_ANIMATION_DURATION);
 }
 
-// Проверка соседства
-function isAdjacent(row1, col1, row2, col2) {
-    return (Math.abs(row1 - row2) === 1 && col1 === col2) || 
-           (Math.abs(col1 - col2) === 1 && row1 === row2);
+function canMove(row, col) {
+    return (
+        (Math.abs(row - emptyPos.row) === 1 && col === emptyPos.col) ||
+        (Math.abs(col - emptyPos.col) === 1 && row === emptyPos.row)
+    );
 }
 
-// Проверка победы
 function checkWin() {
     let counter = 1;
     let isWin = true;
