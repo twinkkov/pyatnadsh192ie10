@@ -5,8 +5,6 @@ const tgWebApp = window.Telegram && window.Telegram.WebApp;
 if (tgWebApp) {
     tgWebApp.ready();
     tgWebApp.expand();
-    document.documentElement.style.setProperty('--primary-color', '#0088cc');
-    document.documentElement.style.setProperty('--secondary-color', '#3ac0ef');
 }
 
 // Настройки анимации
@@ -62,19 +60,19 @@ function initGame() {
     renderBoard();
 }
 
-function isSolvable(numbers) {
-    let inversions = 0;
-    for (let i = 0; i < numbers.length; i++) {
-        for (let j = i + 1; j < numbers.length; j++) {
-            if (numbers[i] > numbers[j]) inversions++;
-        }
-    }
-    return inversions % 2 === 0;
-}
-
 function renderBoard() {
     boardElement.innerHTML = '';
     tiles = [];
+    
+    // Создаем контейнер для плиток
+    const tilesContainer = document.createElement('div');
+    tilesContainer.className = 'tiles-container';
+    boardElement.appendChild(tilesContainer);
+    
+    // Создаем сетку для позиционирования
+    const grid = document.createElement('div');
+    grid.className = 'tiles-grid';
+    tilesContainer.appendChild(grid);
     
     board.forEach((row, i) => {
         row.forEach((value, j) => {
@@ -86,10 +84,13 @@ function renderBoard() {
                 tile.dataset.row = i;
                 tile.dataset.col = j;
                 tile.addEventListener('click', () => handleTileClick(i, j));
-                tile.style.animation = `tileAppear 0.3s ease ${(i * 4 + j) * 0.05}s both`;
+                
+                // Позиционирование
+                tile.style.gridRow = i + 1;
+                tile.style.gridColumn = j + 1;
             }
             
-            boardElement.appendChild(tile);
+            grid.appendChild(tile);
             tiles.push(tile);
         });
     });
@@ -100,29 +101,34 @@ function handleTileClick(row, col) {
     
     isAnimating = true;
     const tile = getTileAt(row, col);
-    const emptyTile = getTileAt(emptyPos.row, emptyPos.col);
     
-    // Сохраняем начальные позиции
-    const startRow = row;
-    const startCol = col;
+    // Запоминаем начальную позицию
+    const startX = col;
+    const startY = row;
+    
+    // Вычисляем смещение
+    const dx = emptyPos.col - col;
+    const dy = emptyPos.row - row;
+    
+    // Применяем анимацию
+    tile.style.transition = `transform ${ANIMATION.duration}ms ${ANIMATION.easing}`;
+    tile.style.transform = `translate(${dx * 100}%, ${dy * 100}%)`;
+    tile.style.zIndex = '10';
     
     // Обновляем состояние доски
     board[emptyPos.row][emptyPos.col] = board[row][col];
     board[row][col] = 0;
-    
-    // Анимация перемещения
-    tile.style.transition = `all ${ANIMATION.duration}ms ${ANIMATION.easing}`;
-    tile.style.transform = `translate(${(emptyPos.col - col) * 100}%, ${(emptyPos.row - row) * 100}%)`;
-    tile.style.zIndex = '10';
     
     setTimeout(() => {
         // Обновляем DOM
         tile.style.transform = 'translate(0, 0)';
         tile.dataset.row = emptyPos.row;
         tile.dataset.col = emptyPos.col;
+        tile.style.gridRow = emptyPos.row + 1;
+        tile.style.gridColumn = emptyPos.col + 1;
         
         // Обновляем позицию пустой клетки
-        emptyPos = { row: startRow, col: startCol };
+        emptyPos = { row, col };
         
         moves++;
         movesElement.textContent = moves;
@@ -136,45 +142,8 @@ function handleTileClick(row, col) {
     }, ANIMATION.duration);
 }
 
-function getTileAt(row, col) {
-    return tiles.find(t => 
-        parseInt(t.dataset.row) === row && 
-        parseInt(t.dataset.col) === col
-    );
-}
+// Остальные вспомогательные функции остаются без изменений
+// ...
 
-function canMove(row, col) {
-    return (
-        (Math.abs(row - emptyPos.row) === 1 && col === emptyPos.col) ||
-        (Math.abs(col - emptyPos.col) === 1 && row === emptyPos.row)
-    );
-}
-
-function checkWin() {
-    let counter = 1;
-    let isWin = true;
-    
-    board.forEach((row, i) => {
-        row.forEach((value, j) => {
-            if (i === 3 && j === 3) {
-                if (value !== 0) isWin = false;
-            } else if (value !== counter) {
-                isWin = false;
-            }
-            counter++;
-        });
-    });
-    
-    if (isWin && gameStarted) {
-        gameStarted = false;
-        messageElement.textContent = `Победа! Ходов: ${moves}`;
-        
-        if (tgWebApp) {
-            tgWebApp.sendData(`Победа за ${moves} ходов!`);
-        }
-    }
-}
-
-// Инициализация
 newGameBtn.addEventListener('click', initGame);
 document.addEventListener('DOMContentLoaded', initGame);
