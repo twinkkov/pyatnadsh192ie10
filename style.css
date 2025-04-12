@@ -84,14 +84,16 @@ body {
     padding: 20px;
 }
 
+/* Увеличиваем размеры плиток и исправляем их позиционирование */
 .tiles-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 10px; /* Увеличиваем расстояние между блоками */
+    gap: 10px;
     width: 100%;
-    max-width: 400px; /* Ограничиваем максимальный размер */
+    max-width: 500px; /* Увеличиваем максимальный размер */
     aspect-ratio: 1;
+    position: relative; /* Для абсолютного позиционирования плиток */
 }
 
 .tiles-grid {
@@ -116,18 +118,19 @@ body {
 }
 
 .tile {
+    position: absolute; /* Абсолютное позиционирование для перемещения */
+    width: calc(25% - 10px); /* Учитываем gap для ширины */
+    height: calc(25% - 10px); /* Учитываем gap для высоты */
     display: flex;
     justify-content: center;
     align-items: center;
     background: #636e72;
     color: white;
-    font-size: 28px; /* Увеличиваем размер текста */
+    font-size: 28px;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
     transition: transform 0.3s ease-out, background 0.2s ease;
-    position: relative;
-    height: 100%; /* Устанавливаем высоту для адаптации */
 }
 
 .tile:hover {
