@@ -80,7 +80,12 @@ function updateTilePositions() {
       const value = board[i][j];
       if (value === 0) continue;
       const tile = tileElements[value];
+
+      // ⬇ ОБНОВЛЯЕМ ПОЗИЦИЮ ПЛИТКИ
       tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
+
+      // ⬇ ОБНОВЛЯЕМ ОБРАБОТЧИК КЛИКА
+      tile.onclick = () => handleTileClick(i, j);
     }
   }
 }
