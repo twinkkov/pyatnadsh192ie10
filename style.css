@@ -2,19 +2,26 @@
     --primary-color: #7a6ddf;
     --secondary-color: #a29bfe;
     --accent-color: #8f36bc;
-    --text-color: #000000;
+    --text-color: #1f1f1f;
     --light-text: #ffffff;
     --tile-color: #a348ca;
-    --bg-color: #bcbcbc;
+    --bg-color: #f5f5f5;
+    --container-bg: #ffffff;
+    --container-shadow: rgba(0, 0, 0, 0.1);
     --success-color: #4cad9a;
     --animation-duration: 0.3s;
+    --animation-duration-long: 0.5s;
     --animation-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --tile-fade-duration: 0.5s;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     margin: 0;
     padding: 20px;
     min-height: 100vh;
@@ -26,16 +33,20 @@ body {
 .app-container {
     width: 100%;
     max-width: 600px;
-    background: #b483cf;
+    background: var(--container-bg);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 30px var(--container-shadow);
     overflow: hidden;
-    padding: 50px;
-    margin: 0 auto; /* Центрируем по горизонтали */
+    padding: 40px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Центрируем содержимое по горизонтали */
-    justify-content: center; /* Центрируем содержимое по вертикали */
+    align-items: center;
+    transition: transform 0.3s;
+}
+
+.app-container:hover {
+    transform: scale(1.02);
 }
 
 .game-header {
@@ -43,10 +54,18 @@ body {
     margin-bottom: 20px;
 }
 
+.game-header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    color: var(--primary-color);
+}
+
 .stats-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .new-game-btn {
@@ -57,23 +76,22 @@ body {
     color: var(--light-text);
     border: none;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .new-game-btn:hover {
     background: var(--secondary-color);
+    transform: scale(1.05);
 }
 
 .tiles-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 10px;
-    width: 100%;
-    aspect-ratio: 1;
+    width: min(400px, 90vw);
+    aspect-ratio: 1; 
     background: var(--bg-color);
     border-radius: 16px;
-    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    margin: 20px 0;
 }
 
 .tile {
@@ -86,8 +104,25 @@ body {
     font-weight: bold;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, background 0.3s ease;
     cursor: pointer;
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 25%;
+    
+    transition: transform var(--animation-duration) var(--animation-easing),
+                background var(--animation-duration) ease, 
+                opacity var(--tile-fade-duration) ease;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }
 
 .tile:hover {
@@ -105,6 +140,7 @@ body {
 .message-container {
     text-align: center;
     margin-top: 20px;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--success-color);
+    font-weight: bold;
 }

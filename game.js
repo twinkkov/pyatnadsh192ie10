@@ -1,7 +1,5 @@
-// Проверка Telegram WebApp
+// Проверка наличия Telegram WebApp
 const tgWebApp = window.Telegram && window.Telegram.WebApp;
-
-// Инициализация WebApp
 if (tgWebApp) {
     tgWebApp.ready();
     tgWebApp.expand();
@@ -26,7 +24,7 @@ function initGame() {
     for (let i = 0; i < 4; i++) {
         board.push(numbers.slice(i * 4, i * 4 + 4));
     }
-    board[3][3] = 0;
+    board[3][3] = 0; // Обозначаем пустую клетку
     emptyPos = { row: 3, col: 3 };
     moves = 0;
     movesElement.textContent = moves;
@@ -41,6 +39,7 @@ function shuffle(array) {
     }
 }
 
+// Проверка на решаемость пазла
 function isSolvable(numbers) {
     let inversions = 0;
     for (let i = 0; i < numbers.length; i++) {
@@ -53,28 +52,57 @@ function isSolvable(numbers) {
 
 function renderBoard() {
     boardElement.innerHTML = '';
-    board.forEach((row, i) => {
-        row.forEach((value, j) => {
+
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            const value = board[i][j];
+            if (value === 0) continue; // Пропускаем пустую клетку
+
             const tile = document.createElement('div');
-            tile.className = value === 0 ? 'tile empty' : 'tile';
-            if (value !== 0) tile.textContent = value;
+            tile.className = 'tile';
+            tile.textContent = value;
+            // Абсолютное позиционирование через transform (сдвиг на j и i клеток)
+            tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
             tile.addEventListener('click', () => handleTileClick(i, j));
             boardElement.appendChild(tile);
-        });
-    });
+        }
+    }
 }
 
 function handleTileClick(row, col) {
+    // Если плитка рядом с пустым местом (по горизонтали или вертикали)
     if (Math.abs(emptyPos.row - row) + Math.abs(emptyPos.col - col) === 1) {
-        board[emptyPos.row][emptyPos.col] = board[row][col];
+        const tileValue = board[row][col];
+
+        // Обновляем массив игрового поля: меняем местами значение плитки и пустой клетки
+        board[emptyPos.row][emptyPos.col] = tileValue;
         board[row][col] = 0;
+
+        // Запоминаем старую позицию пустой клетки
+        const oldEmptyPos = { ...emptyPos };
         emptyPos = { row, col };
         moves++;
         movesElement.textContent = moves;
-        renderBoard();
-        if (checkWin()) {
-            messageElement.textContent = 'Поздравляем! Вы выиграли!';
+
+        // Находим плитку, которая была нажата
+        const tiles = Array.from(boardElement.children);
+        const movingTile = tiles.find(t => parseInt(t.textContent) === tileValue);
+        if (movingTile) {
+            // Перемещаем плитку: сначала сдвигаем её в позицию предыдущей пустой клетки
+            movingTile.style.transform = `translate(${oldEmptyPos.col * 100}%, ${oldEmptyPos.row * 100}%)`;
+            // Затем с небольшой задержкой перемещаем плитку в новую позицию
+            setTimeout(() => {
+                movingTile.style.transform = `translate(${col * 100}%, ${row * 100}%)`;
+            }, 20);
         }
+
+        // По окончании анимации (300 мс) перерисовываем доску и проверяем выигрыш
+        setTimeout(() => {
+            renderBoard();
+            if (checkWin()) {
+                messageElement.textContent = 'Поздравляем! Вы выиграли!';
+            }
+        }, 300);
     }
 }
 
