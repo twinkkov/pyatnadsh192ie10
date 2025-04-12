@@ -85,14 +85,19 @@ body {
 }
 
 .tiles-container {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 1;
-    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
+    gap: 8px; /* Уменьшаем отступы между плитками */
+    width: 100%;
+    max-width: 400px; /* Уменьшаем ширину поля */
+    aspect-ratio: 1; /* Сохраняем квадратное соотношение сторон */
+    margin: 0 auto; /* Центрируем поле */
+    background: var(--bg-color);
+    border-radius: 16px; /* Закругленные углы для красоты */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 10px; /* Уменьшаем внутренние отступы */
+    position: relative; /* Относительное позиционирование для корректного размещения плиток */
 }
 
 .tiles-grid {
@@ -116,29 +121,42 @@ body {
     }
 }
 
+@keyframes tileMove {
+    from {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 .tile {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    aspect-ratio: 1; /* Сохраняем квадратные плитки */
+    border-radius: 12px; /* Закругленные углы плиток */
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--light-text);
+    font-size: 1.5em; /* Уменьшаем размер шрифта */
+    font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #636e72;
-    color: white;
-    font-size: 2em;
-    font-weight: bold;
-    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background 0.3s ease;
     cursor: pointer;
-    transition: transform 0.3s ease-out, background 0.2s ease;
 }
 
 .tile:hover {
-    transform: scale(1.02);
-    background: var(--primary-color);
+    background: var(--accent-color);
+    transform: scale(1.05);
 }
 
 .tile.empty {
     visibility: hidden;
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
 }
 
 .empty {
@@ -152,6 +170,17 @@ body {
     color: var(--success-color);
     font-weight: 500;
     height: 20px;
+}
+
+@media (max-width: 768px) {
+    .tiles-container {
+        max-width: 90%; /* Уменьшаем ширину на маленьких экранах */
+        padding: 10px; /* Уменьшаем внутренние отступы */
+    }
+
+    .tile {
+        font-size: 1.5em; /* Уменьшаем размер шрифта на маленьких экранах */
+    }
 }
 
 @media (max-width: 420px) {
