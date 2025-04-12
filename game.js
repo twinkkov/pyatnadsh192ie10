@@ -124,6 +124,12 @@ function handleTileClick(row, col) {
     }, 300);
 }
 
+function canMove(row, col) {
+    const dx = Math.abs(emptyPos.col - col);
+    const dy = Math.abs(emptyPos.row - row);
+    return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
+}
+
 // Остальные функции остаются без изменений
 // ...
 

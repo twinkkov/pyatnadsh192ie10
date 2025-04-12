@@ -88,8 +88,9 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 8px;
+    gap: 10px; /* Увеличиваем расстояние между блоками */
     width: 100%;
+    max-width: 400px; /* Ограничиваем максимальный размер */
     aspect-ratio: 1;
 }
 
@@ -120,12 +121,13 @@ body {
     align-items: center;
     background: #636e72;
     color: white;
-    font-size: 24px;
+    font-size: 28px; /* Увеличиваем размер текста */
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out, background 0.2s ease;
     position: relative;
+    height: 100%; /* Устанавливаем высоту для адаптации */
 }
 
 .tile:hover {
