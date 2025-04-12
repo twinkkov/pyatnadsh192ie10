@@ -47,13 +47,10 @@ body {
     font-weight: 600;
 }
 
-/* Уменьшаем размеры кнопок, чтобы они помещались на одном поле */
 .stats-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; /* Позволяем кнопкам переноситься на следующую строку при необходимости */
-    gap: 10px; /* Добавляем отступы между элементами */
 }
 
 .moves-counter {
@@ -66,17 +63,14 @@ body {
     color: var(--accent-color);
 }
 
-/* Ещё больше уменьшаем размеры кнопок */
 .new-game-btn {
-    padding: 4px 8px; /* Ещё больше уменьшаем внутренние отступы */
-    font-size: 10px; /* Уменьшаем размер шрифта */
-    border-radius: 6px; /* Сохраняем закругленные углы */
-    max-width: 80px; /* Ограничиваем максимальную ширину кнопки */
-    text-align: center;
     background: rgba(255, 255, 255, 0.2);
     border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
     color: white;
     font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -85,28 +79,22 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Исправляем отображение игрового поля */
 .game-board {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px; /* Устанавливаем фиксированную высоту для игрового поля */
-    background: var(--bg-color);
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 20px;
 }
 
-/* Увеличиваем размеры игрового поля и корректируем плитки */
 .tiles-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 1;
+    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 8px; /* Увеличиваем отступы между плитками */
-    width: 100%;
-    max-width: 400px; /* Увеличиваем ширину контейнера */
-    aspect-ratio: 1; /* Сохраняем квадратное соотношение сторон */
-    margin: 0 auto; /* Центрируем поле */
 }
 
 .tiles-grid {
@@ -139,12 +127,11 @@ body {
     align-items: center;
     background: #7a6ddf;
     color: white;
-    font-size: 1.5em; /* Увеличиваем размер шрифта для лучшей читаемости */
+    font-size: 2em;
     font-weight: bold;
-    border-radius: 10px; /* Добавляем закругленные углы */
+    border-radius: 8px;
     cursor: pointer;
     transition: transform 0.3s ease-out, background 0.2s ease;
-    aspect-ratio: 1; /* Сохраняем квадратные плитки */
 }
 
 .tile:hover {

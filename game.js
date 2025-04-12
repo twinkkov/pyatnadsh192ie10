@@ -64,31 +64,29 @@ function initGame() {
 }
 
 function renderBoard() {
+    boardElement.innerHTML = '';
+
+    // Создаем контейнер для плиток
+    const container = document.createElement('div');
+    container.className = 'tiles-container';
+    boardElement.appendChild(container);
+
     board.forEach((row, i) => {
         row.forEach((value, j) => {
-            const existingTile = document.querySelector(`.tile[data-row="${i}"][data-col="${j}"]`);
+            const tile = document.createElement('div');
+            tile.className = value === 0 ? 'tile empty' : 'tile';
 
-            if (existingTile) {
-                if (value === 0) {
-                    existingTile.classList.add('empty');
-                    existingTile.textContent = '';
-                } else {
-                    existingTile.classList.remove('empty');
-                    existingTile.textContent = value;
-                }
-            } else {
-                const tile = document.createElement('div');
-                tile.className = value === 0 ? 'tile empty' : 'tile';
-                tile.textContent = value === 0 ? '' : value;
+            if (value !== 0) {
+                tile.textContent = value;
                 tile.dataset.row = i;
                 tile.dataset.col = j;
                 tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
-                tile.style.transition = 'transform 0.3s ease-out';
-                if (value !== 0) {
-                    tile.addEventListener('click', () => handleTileClick(i, j));
-                }
-                boardElement.appendChild(tile);
+                tile.addEventListener('click', () => handleTileClick(i, j));
+            } else {
+                tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
             }
+
+            container.appendChild(tile);
         });
     });
 }
