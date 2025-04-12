@@ -161,18 +161,30 @@ function checkWin() {
   return true;
 }
 
+// ✅ Обновлённая победная анимация
 function winSequence() {
   clearInterval(timerInterval);
   messageElement.textContent = '🎉 Победа!';
   winSound.play();
+
   const tiles = Object.values(tileElements);
+
   tiles.forEach(tile => {
-    const dx = Math.random() * 400 - 200 + 'px';
-    const dy = Math.random() * 400 - 200 + 'px';
-    tile.style.setProperty('--dx', dx);
-    tile.style.setProperty('--dy', dy);
-    tile.style.animation = 'explode 0.8s ease forwards';
+    tile.style.transition = 'none'; // отключаем transition для моментального эффекта
+    const dx = (Math.random() * 2 - 1) * 500;
+    const dy = (Math.random() * 2 - 1) * 500;
+    tile.style.transform = `translate(${dx}px, ${dy}px) rotate(720deg) scale(0.5)`;
+    tile.style.opacity = '0';
   });
+
+  // Через 1.2с сбрасываем всё
+  setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.style.transition = '';
+      tile.style.transform = '';
+      tile.style.opacity = '';
+    });
+  }, 1200);
 }
 
 newGameBtn.onclick = initGame;
