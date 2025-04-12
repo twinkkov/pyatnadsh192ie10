@@ -8,8 +8,8 @@ if (tgWebApp) {
 let board = [];
 let emptyPos = { row: 3, col: 3 };
 let moves = 0;
-let isMoving = false;       // блокировка во время анимации
-let tileElements = {};      // отображаемые плитки: {число: DOMElement}
+let isMoving = false;       // блокируем ходы во время анимации
+let tileElements = {};      // сохраняем DOM-элементы плиток: {число: DOMElement}
 
 const boardElement = document.getElementById('board');
 const movesElement = document.getElementById('moves');
@@ -17,7 +17,6 @@ const messageElement = document.getElementById('message');
 const newGameBtn = document.getElementById('new-game');
 
 function initGame() {
-  // Генерация массива номеров 1...15
   const numbers = Array.from({ length: 15 }, (_, i) => i + 1);
   do {
     shuffle(numbers);
@@ -33,7 +32,7 @@ function initGame() {
   movesElement.textContent = moves;
   messageElement.textContent = '';
 
-  // Создание плиток один раз, без полного перерендера после каждого хода
+  // Создаем плитки один раз, без полного перерендера после каждого хода
   createTiles();
 }
 
@@ -44,7 +43,6 @@ function shuffle(array) {
   }
 }
 
-// Простая проверка решаемости (по числу инверсий)
 function isSolvable(numbers) {
   let inversions = 0;
   for (let i = 0; i < numbers.length; i++) {
@@ -55,55 +53,52 @@ function isSolvable(numbers) {
   return inversions % 2 === 0;
 }
 
-// Создание плиток на поле на основе объекта board
 function createTiles() {
   boardElement.innerHTML = '';
   tileElements = {};
-  
+
   for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
       const value = board[i][j];
       if (value === 0) continue;
-      
+
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.textContent = value;
-      // Первоначальное абсолютное позиционирование по расчету (j * 100%, i * 100%)
+      // Первоначальное позиционирование: смещаем плитку по координатам (j, i)
       tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
       tile.addEventListener('click', () => handleTileClick(i, j));
       boardElement.appendChild(tile);
-      
+
       tileElements[value] = tile;
     }
   }
 }
 
-// Обработчик клика по плитке
 function handleTileClick(row, col) {
-  // Если сейчас анимация – игнорируем клик
-  if (isMoving) return;
-  
-  // Проверяем, находится ли плитка рядом с пустой клеткой
-  if (Math.abs(emptyPos.row - row) + Math.abs(emptyPos.col - col) !== 1) return;
-  
+  // Если в данный момент идет анимация или плитка не соседняя – выходим
+  if (isMoving || Math.abs(emptyPos.row - row) + Math.abs(emptyPos.col - col) !== 1) return;
+
   isMoving = true;
-  
   const tileValue = board[row][col];
-  // Обновляем внутреннее игровое поле: перемещаем значение плитки в пустую клетку
+
+  // Обновляем игровое поле: перемещаем плитку в пустую клетку
   board[emptyPos.row][emptyPos.col] = tileValue;
   board[row][col] = 0;
-  
+
   const oldEmptyPos = { ...emptyPos };
   emptyPos = { row, col };
   moves++;
   movesElement.textContent = moves;
-  
-  // Находим DOM-элемент плитки по значению
+
   const movingTile = tileElements[tileValue];
-  // Обновляем позицию плитки (плавно благодаря transition в CSS)
-  movingTile.style.transform = `translate(${col * 100}%, ${row * 100}%)`;
-  
-  // Ждем окончания анимации, прежде чем разблокировать клики
+
+  // Используем requestAnimationFrame для гарантированного перехода
+  requestAnimationFrame(() => {
+    movingTile.style.transform = `translate(${col * 100}%, ${row * 100}%)`;
+  });
+
+  // По окончании анимации (300 мс) снимаем блокировку и проверяем победу
   setTimeout(() => {
     isMoving = false;
     if (checkWin()) {
