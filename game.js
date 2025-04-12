@@ -1,4 +1,3 @@
-// Telegram WebApp support
 const tgWebApp = window.Telegram && window.Telegram.WebApp;
 if (tgWebApp) {
   tgWebApp.ready();
@@ -9,11 +8,16 @@ let board = [];
 let emptyPos = { row: 3, col: 3 };
 let moves = 0;
 let isAnimating = false;
+let tileElements = {};
 const boardElement = document.getElementById('board');
 const movesElement = document.getElementById('moves');
 const messageElement = document.getElementById('message');
 const newGameBtn = document.getElementById('new-game');
-let tileElements = {};
+
+// 🎵 Звук при клике
+const clickSound = new Audio();
+clickSound.src = 'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA...'; // здесь можно вставить свой base64 звук
+clickSound.volume = 0.5;
 
 function initGame() {
   const numbers = Array.from({ length: 15 }, (_, i) => i + 1);
@@ -21,7 +25,6 @@ function initGame() {
     shuffle(numbers);
   } while (!isSolvable(numbers));
 
-  // Инициализируем поле 4x4
   board = [];
   for (let i = 0; i < 4; i++) {
     board.push(numbers.slice(i * 4, i * 4 + 4));
@@ -31,8 +34,6 @@ function initGame() {
   moves = 0;
   movesElement.textContent = moves;
   messageElement.textContent = '';
-
-  // Создаем плитки
   createTiles();
   updateTilePositions();
 }
@@ -57,17 +58,14 @@ function isSolvable(numbers) {
 function createTiles() {
   boardElement.innerHTML = '';
   tileElements = {};
-
   for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
       const value = board[i][j];
       if (value === 0) continue;
-
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.textContent = value;
       tile.dataset.value = value;
-      tile.addEventListener('click', () => handleTileClick(i, j));
       boardElement.appendChild(tile);
       tileElements[value] = tile;
     }
@@ -80,11 +78,7 @@ function updateTilePositions() {
       const value = board[i][j];
       if (value === 0) continue;
       const tile = tileElements[value];
-
-      // ⬇ ОБНОВЛЯЕМ ПОЗИЦИЮ ПЛИТКИ
       tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
-
-      // ⬇ ОБНОВЛЯЕМ ОБРАБОТЧИК КЛИКА
       tile.onclick = () => handleTileClick(i, j);
     }
   }
@@ -92,22 +86,20 @@ function updateTilePositions() {
 
 function handleTileClick(row, col) {
   if (isAnimating) return;
-
   const dr = Math.abs(row - emptyPos.row);
   const dc = Math.abs(col - emptyPos.col);
-
-  if ((dr + dc) !== 1) return;
+  if (dr + dc !== 1) return;
 
   const value = board[row][col];
-
-  // Обновляем игровое поле
   board[emptyPos.row][emptyPos.col] = value;
   board[row][col] = 0;
-
-  // Двигаем плитку
   emptyPos = { row, col };
   moves++;
   movesElement.textContent = moves;
+
+  // 🔊 звук
+  clickSound.currentTime = 0;
+  clickSound.play().catch(() => {});
 
   isAnimating = true;
   updateTilePositions();
@@ -117,7 +109,7 @@ function handleTileClick(row, col) {
     if (checkWin()) {
       messageElement.textContent = 'Поздравляем! Вы выиграли!';
     }
-  }, 310); // на 10мс больше, чем CSS transition
+  }, 310);
 }
 
 function checkWin() {
