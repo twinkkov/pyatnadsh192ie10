@@ -100,32 +100,32 @@ function checkWin() {
 
 function handleTileClick(row, col) {
     if (!gameStarted || isAnimating || !canMove(row, col)) return;
-    
+
     isAnimating = true;
     const tile = document.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
-    
+
     // Вычисляем направление движения
     const dx = emptyPos.col - col;
     const dy = emptyPos.row - row;
-    
+
     // Применяем анимацию
     tile.style.transition = 'transform 0.3s ease-out';
     tile.style.transform = `translate(${dx * 100}%, ${dy * 100}%)`;
-    
+
     setTimeout(() => {
         // Обновляем состояние
         board[emptyPos.row][emptyPos.col] = board[row][col];
         board[row][col] = 0;
-        
+
         // Обновляем DOM
-        tile.style.transform = 'translate(0, 0)';
+        tile.style.transform = '';
         tile.dataset.row = emptyPos.row;
         tile.dataset.col = emptyPos.col;
-        
+
         emptyPos = { row, col };
         moves++;
         movesElement.textContent = moves;
-        
+
         setTimeout(() => {
             tile.style.transition = '';
             isAnimating = false;

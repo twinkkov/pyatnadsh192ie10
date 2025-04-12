@@ -118,9 +118,9 @@ body {
 }
 
 .tile {
-    position: absolute; /* Абсолютное позиционирование для перемещения */
-    width: calc(25% - 5px); /* Учитываем gap для ширины */
-    height: calc(25% - 5px); /* Учитываем gap для высоты */
+    position: relative; /* Плитки остаются в сетке */
+    width: 100%; /* Плитки занимают всю ячейку */
+    height: 100%; /* Плитки занимают всю ячейку */
     display: flex;
     justify-content: center;
     align-items: center;
