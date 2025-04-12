@@ -87,7 +87,7 @@ body {
 .tiles-container {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 100%;
     aspect-ratio: 1;
     margin: 0 auto;
     display: grid;
@@ -118,14 +118,14 @@ body {
 
 .tile {
     position: absolute;
-    width: 25%;
-    height: 25%;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #636e72;
     color: white;
-    font-size: 24px;
+    font-size: 2em;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
