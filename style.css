@@ -86,7 +86,7 @@ body {
     font-weight: bold;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out; /* Плавная анимация перемещения и изменения фона */
     cursor: pointer;
 }
 

@@ -53,12 +53,23 @@ function isSolvable(numbers) {
 
 function renderBoard() {
     boardElement.innerHTML = '';
+
     board.forEach((row, i) => {
         row.forEach((value, j) => {
             const tile = document.createElement('div');
             tile.className = value === 0 ? 'tile empty' : 'tile';
-            if (value !== 0) tile.textContent = value;
-            tile.addEventListener('click', () => handleTileClick(i, j));
+
+            if (value !== 0) {
+                tile.textContent = value;
+                tile.dataset.row = i;
+                tile.dataset.col = j;
+                tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
+                tile.style.transition = 'transform 0.3s ease-in-out'; // Убедимся, что анимация включена
+                tile.addEventListener('click', () => handleTileClick(i, j));
+            } else {
+                tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
+            }
+
             boardElement.appendChild(tile);
         });
     });
@@ -66,15 +77,26 @@ function renderBoard() {
 
 function handleTileClick(row, col) {
     if (Math.abs(emptyPos.row - row) + Math.abs(emptyPos.col - col) === 1) {
+        const tile = document.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
+
+        // Вычисляем новое положение плитки
+        const newTransform = `translate(${emptyPos.col * 100}%, ${emptyPos.row * 100}%)`;
+        tile.style.transform = newTransform;
+
+        // Обновляем состояние доски
         board[emptyPos.row][emptyPos.col] = board[row][col];
         board[row][col] = 0;
         emptyPos = { row, col };
         moves++;
         movesElement.textContent = moves;
-        renderBoard();
-        if (checkWin()) {
-            messageElement.textContent = 'Поздравляем! Вы выиграли!';
-        }
+
+        // Перерисовываем доску после завершения анимации
+        setTimeout(() => {
+            renderBoard();
+            if (checkWin()) {
+                messageElement.textContent = 'Поздравляем! Вы выиграли!';
+            }
+        }, 300); // Задержка для завершения анимации
     }
 }
 
