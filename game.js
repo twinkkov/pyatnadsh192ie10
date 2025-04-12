@@ -88,6 +88,16 @@ function renderBoard() {
     });
 }
 
+function checkWin() {
+    const winningBoard = Array.from({ length: 15 }, (_, i) => i + 1).concat(0);
+    const currentBoard = board.flat();
+
+    if (currentBoard.every((value, index) => value === winningBoard[index])) {
+        messageElement.textContent = 'Поздравляем! Вы выиграли!';
+        gameStarted = false;
+    }
+}
+
 function handleTileClick(row, col) {
     if (!gameStarted || isAnimating || !canMove(row, col)) return;
     
@@ -128,16 +138,6 @@ function canMove(row, col) {
     const dx = Math.abs(emptyPos.col - col);
     const dy = Math.abs(emptyPos.row - row);
     return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
-}
-
-function checkWin() {
-    const winningBoard = Array.from({ length: 15 }, (_, i) => i + 1).concat(0);
-    const currentBoard = board.flat();
-
-    if (currentBoard.every((value, index) => value === winningBoard[index])) {
-        messageElement.textContent = 'Поздравляем! Вы выиграли!';
-        gameStarted = false;
-    }
 }
 
 // Остальные функции остаются без изменений
