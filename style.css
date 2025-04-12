@@ -5,57 +5,59 @@
     --text-color: #1f1f1f;
     --light-text: #ffffff;
     --tile-color: #a348ca;
-    --bg-color: #f5f5f5;
+    --bg-color: #f1f1f1;
     --container-bg: #ffffff;
-    --container-shadow: rgba(0, 0, 0, 0.1);
+    --container-shadow: rgba(0, 0, 0, 0.05);
     --success-color: #4cad9a;
     --animation-duration: 0.3s;
     --animation-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --tile-fade-duration: 0.5s;
   }
   
+  /* === СБРОС === */
   * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
   
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: var(--bg-color);
     margin: 0;
-    padding: 20px;
+    padding: 0;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    user-select: none;
   }
   
+  /* === ОБОЛОЧКА === */
   .app-container {
-    width: 100%;
-    max-width: 600px;
+    width: 100vw;
+    max-width: 420px;
+    height: 100vh;
     background: var(--container-bg);
-    border-radius: 16px;
-    box-shadow: 0 8px 30px var(--container-shadow);
-    overflow: hidden;
-    padding: 40px;
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: transform 0.3s;
+    justify-content: space-between;
+    padding: 16px;
+    box-sizing: border-box;
+    box-shadow: 0 0 8px var(--container-shadow);
+    border-radius: 0;
   }
   
-  .app-container:hover {
-    transform: scale(1.02);
-  }
-  
+  /* === ШАПКА === */
   .game-header {
+    width: 100%;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   .game-header h1 {
     margin: 0;
-    font-size: 2.5em;
+    font-size: 24px;
     color: var(--primary-color);
   }
   
@@ -64,71 +66,64 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-top: 8px;
   }
   
+  /* === КНОПКА === */
   .new-game-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 15px;
+    border-radius: 10px;
     background: var(--primary-color);
     color: var(--light-text);
     border: none;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.3s ease;
+    transition: all 0.3s ease;
   }
   
   .new-game-btn:hover {
     background: var(--secondary-color);
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
   
-  /* Контейнер для плиток */
+  /* === ПОЛЕ === */
   .tiles-container {
-    width: min(400px, 90vw);
-    aspect-ratio: 1; 
+    width: 100%;
+    aspect-ratio: 1;
     background: var(--bg-color);
-    border-radius: 16px;
+    border-radius: 20px;
     position: relative;
     overflow: hidden;
     margin: 20px 0;
   }
   
-  /* Каждая плитка позиционируется абсолютно от (0,0) */
+  /* === ПЛИТКИ === */
   .tile {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: var(--tile-color);
-    color: var(--light-text);
-    font-size: 2em;
-    font-weight: bold;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    
     position: absolute;
     top: 0;
     left: 0;
     width: 25%;
     height: 25%;
-    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8em;
+    font-weight: bold;
+    background: var(--tile-color);
+    color: var(--light-text);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: transform var(--animation-duration) var(--animation-easing),
-                background var(--animation-duration) ease,
-                opacity var(--tile-fade-duration) ease;
-    opacity: 0;
-    animation: fadeIn var(--tile-fade-duration) forwards;
-  }
-  
-  @keyframes fadeIn {
-    to {
-      opacity: 1;
-    }
+                background 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+    z-index: 1;
   }
   
   .tile:hover {
-    transform: scale(1.05);
     background: var(--accent-color);
+    transform: scale(1.05) translateZ(0);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
   }
   
   .tile.empty {
@@ -138,11 +133,12 @@
     cursor: default;
   }
   
+  /* === СООБЩЕНИЯ === */
   .message-container {
     text-align: center;
-    margin-top: 20px;
-    font-size: 18px;
-    color: var(--success-color);
+    font-size: 16px;
     font-weight: bold;
+    color: var(--success-color);
+    min-height: 24px;
   }
   

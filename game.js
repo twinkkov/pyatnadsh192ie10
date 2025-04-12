@@ -1,4 +1,4 @@
-// Проверка наличия Telegram WebApp
+// Telegram WebApp support
 const tgWebApp = window.Telegram && window.Telegram.WebApp;
 if (tgWebApp) {
   tgWebApp.ready();
@@ -8,13 +8,12 @@ if (tgWebApp) {
 let board = [];
 let emptyPos = { row: 3, col: 3 };
 let moves = 0;
-let isMoving = false;       // блокируем ходы во время анимации
-let tileElements = {};      // сохраняем DOM-элементы плиток: {число: DOMElement}
-
+let isAnimating = false;
 const boardElement = document.getElementById('board');
 const movesElement = document.getElementById('moves');
 const messageElement = document.getElementById('message');
 const newGameBtn = document.getElementById('new-game');
+let tileElements = {};
 
 function initGame() {
   const numbers = Array.from({ length: 15 }, (_, i) => i + 1);
@@ -22,18 +21,20 @@ function initGame() {
     shuffle(numbers);
   } while (!isSolvable(numbers));
 
+  // Инициализируем поле 4x4
   board = [];
   for (let i = 0; i < 4; i++) {
     board.push(numbers.slice(i * 4, i * 4 + 4));
   }
-  board[3][3] = 0; // Обозначаем пустую клетку
+  board[3][3] = 0;
   emptyPos = { row: 3, col: 3 };
   moves = 0;
   movesElement.textContent = moves;
   messageElement.textContent = '';
 
-  // Создаем плитки один раз, без полного перерендера после каждого хода
+  // Создаем плитки
   createTiles();
+  updateTilePositions();
 }
 
 function shuffle(array) {
@@ -44,13 +45,13 @@ function shuffle(array) {
 }
 
 function isSolvable(numbers) {
-  let inversions = 0;
+  let inv = 0;
   for (let i = 0; i < numbers.length; i++) {
     for (let j = i + 1; j < numbers.length; j++) {
-      if (numbers[i] > numbers[j]) inversions++;
+      if (numbers[i] > numbers[j]) inv++;
     }
   }
-  return inversions % 2 === 0;
+  return inv % 2 === 0;
 }
 
 function createTiles() {
@@ -65,52 +66,59 @@ function createTiles() {
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.textContent = value;
-      // Первоначальное позиционирование: смещаем плитку по координатам (j, i)
-      tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
+      tile.dataset.value = value;
       tile.addEventListener('click', () => handleTileClick(i, j));
       boardElement.appendChild(tile);
-
       tileElements[value] = tile;
     }
   }
 }
 
+function updateTilePositions() {
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      const value = board[i][j];
+      if (value === 0) continue;
+      const tile = tileElements[value];
+      tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
+    }
+  }
+}
+
 function handleTileClick(row, col) {
-  // Если в данный момент идет анимация или плитка не соседняя – выходим
-  if (isMoving || Math.abs(emptyPos.row - row) + Math.abs(emptyPos.col - col) !== 1) return;
+  if (isAnimating) return;
 
-  isMoving = true;
-  const tileValue = board[row][col];
+  const dr = Math.abs(row - emptyPos.row);
+  const dc = Math.abs(col - emptyPos.col);
 
-  // Обновляем игровое поле: перемещаем плитку в пустую клетку
-  board[emptyPos.row][emptyPos.col] = tileValue;
+  if ((dr + dc) !== 1) return;
+
+  const value = board[row][col];
+
+  // Обновляем игровое поле
+  board[emptyPos.row][emptyPos.col] = value;
   board[row][col] = 0;
 
-  const oldEmptyPos = { ...emptyPos };
+  // Двигаем плитку
   emptyPos = { row, col };
   moves++;
   movesElement.textContent = moves;
 
-  const movingTile = tileElements[tileValue];
+  isAnimating = true;
+  updateTilePositions();
 
-  // Используем requestAnimationFrame для гарантированного перехода
-  requestAnimationFrame(() => {
-    movingTile.style.transform = `translate(${col * 100}%, ${row * 100}%)`;
-  });
-
-  // По окончании анимации (300 мс) снимаем блокировку и проверяем победу
   setTimeout(() => {
-    isMoving = false;
+    isAnimating = false;
     if (checkWin()) {
       messageElement.textContent = 'Поздравляем! Вы выиграли!';
     }
-  }, 300);
+  }, 310); // на 10мс больше, чем CSS transition
 }
 
 function checkWin() {
-  const flatBoard = board.flat();
+  const flat = board.flat();
   for (let i = 0; i < 15; i++) {
-    if (flatBoard[i] !== i + 1) return false;
+    if (flat[i] !== i + 1) return false;
   }
   return true;
 }
