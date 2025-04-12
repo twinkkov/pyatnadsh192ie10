@@ -79,22 +79,26 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
+/* Исправляем отображение игрового поля */
 .game-board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px; /* Устанавливаем фиксированную высоту для игрового поля */
+    background: var(--bg-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
 }
 
 .tiles-container {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 1;
-    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 400px; /* Устанавливаем максимальную ширину */
+    aspect-ratio: 1; /* Сохраняем квадратное соотношение сторон */
 }
 
 .tiles-grid {
