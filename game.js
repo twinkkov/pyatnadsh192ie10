@@ -28,7 +28,7 @@ let isAnimating = false;
 let tileElements = {};
 let history = [];
 
-// 🔊 Звуки
+// Звуки
 const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3');
 const winSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bonus-earned-in-video-game-2058.mp3');
 const errorSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
@@ -101,6 +101,7 @@ function updateTilePositions() {
       const value = board[i][j];
       if (value === 0) continue;
       const tile = tileElements[value];
+      tile.style.transition = "transform 0.3s ease";
       tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
       tile.onclick = () => handleTileClick(i, j);
     }
@@ -161,7 +162,6 @@ function checkWin() {
   return true;
 }
 
-// ✅ Обновлённая победная анимация
 function winSequence() {
   clearInterval(timerInterval);
   messageElement.textContent = '🎉 Победа!';
@@ -170,21 +170,20 @@ function winSequence() {
   const tiles = Object.values(tileElements);
 
   tiles.forEach(tile => {
-    tile.style.transition = 'none'; // отключаем transition для моментального эффекта
-    const dx = (Math.random() * 2 - 1) * 500;
-    const dy = (Math.random() * 2 - 1) * 500;
-    tile.style.transform = `translate(${dx}px, ${dy}px) rotate(720deg) scale(0.5)`;
+    const dx = (Math.random() * 2 - 1) * 150;
+    const dy = (Math.random() * 2 - 1) * 150;
+    tile.style.transition = 'transform 1s ease, opacity 1s ease';
+    tile.style.transform += ` translate(${dx}px, ${dy}px) rotate(360deg) scale(0.7)`;
     tile.style.opacity = '0';
   });
 
-  // Через 1.2с сбрасываем всё
   setTimeout(() => {
     tiles.forEach(tile => {
       tile.style.transition = '';
       tile.style.transform = '';
       tile.style.opacity = '';
     });
-  }, 1200);
+  }, 1500);
 }
 
 newGameBtn.onclick = initGame;
