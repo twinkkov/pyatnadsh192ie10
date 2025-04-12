@@ -7,19 +7,12 @@ if (tgWebApp) {
     tgWebApp.expand();
 }
 
-// Настройки анимации
-const ANIMATION = {
-    duration: 300,
-    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-};
-
 // Состояние игры
 let board = [];
 let emptyPos = { row: 3, col: 3 };
 let moves = 0;
 let gameStarted = false;
 let isAnimating = false;
-let tiles = [];
 
 // DOM элементы
 const boardElement = document.getElementById('board');
@@ -62,17 +55,11 @@ function initGame() {
 
 function renderBoard() {
     boardElement.innerHTML = '';
-    tiles = [];
     
     // Создаем контейнер для плиток
-    const tilesContainer = document.createElement('div');
-    tilesContainer.className = 'tiles-container';
-    boardElement.appendChild(tilesContainer);
-    
-    // Создаем сетку для позиционирования
-    const grid = document.createElement('div');
-    grid.className = 'tiles-grid';
-    tilesContainer.appendChild(grid);
+    const container = document.createElement('div');
+    container.className = 'tiles-container';
+    boardElement.appendChild(container);
     
     board.forEach((row, i) => {
         row.forEach((value, j) => {
@@ -84,14 +71,9 @@ function renderBoard() {
                 tile.dataset.row = i;
                 tile.dataset.col = j;
                 tile.addEventListener('click', () => handleTileClick(i, j));
-                
-                // Позиционирование
-                tile.style.gridRow = i + 1;
-                tile.style.gridColumn = j + 1;
             }
             
-            grid.appendChild(tile);
-            tiles.push(tile);
+            container.appendChild(tile);
         });
     });
 }
@@ -100,50 +82,40 @@ function handleTileClick(row, col) {
     if (!gameStarted || isAnimating || !canMove(row, col)) return;
     
     isAnimating = true;
-    const tile = getTileAt(row, col);
+    const tile = document.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
     
-    // Запоминаем начальную позицию
-    const startX = col;
-    const startY = row;
-    
-    // Вычисляем смещение
+    // Вычисляем направление движения
     const dx = emptyPos.col - col;
     const dy = emptyPos.row - row;
     
     // Применяем анимацию
-    tile.style.transition = `transform ${ANIMATION.duration}ms ${ANIMATION.easing}`;
+    tile.style.transition = 'transform 0.3s ease-out';
     tile.style.transform = `translate(${dx * 100}%, ${dy * 100}%)`;
-    tile.style.zIndex = '10';
-    
-    // Обновляем состояние доски
-    board[emptyPos.row][emptyPos.col] = board[row][col];
-    board[row][col] = 0;
     
     setTimeout(() => {
+        // Обновляем состояние
+        board[emptyPos.row][emptyPos.col] = board[row][col];
+        board[row][col] = 0;
+        
         // Обновляем DOM
         tile.style.transform = 'translate(0, 0)';
         tile.dataset.row = emptyPos.row;
         tile.dataset.col = emptyPos.col;
-        tile.style.gridRow = emptyPos.row + 1;
-        tile.style.gridColumn = emptyPos.col + 1;
         
-        // Обновляем позицию пустой клетки
         emptyPos = { row, col };
-        
         moves++;
         movesElement.textContent = moves;
         
         setTimeout(() => {
             tile.style.transition = '';
-            tile.style.zIndex = '';
             isAnimating = false;
             checkWin();
-        }, ANIMATION.duration);
-    }, ANIMATION.duration);
+        }, 50);
+    }, 300);
 }
 
-// Остальные вспомогательные функции остаются без изменений
+// Остальные функции остаются без изменений
 // ...
 
 newGameBtn.addEventListener('click', initGame);
-document.addEventListener('DOMContentLoaded', initGame);
+document.addEventListener('DOMContentLoaded', initGame);    

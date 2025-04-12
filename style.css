@@ -85,7 +85,10 @@ body {
 }
 
 .tiles-container {
-    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 8px;
     width: 100%;
     aspect-ratio: 1;
 }
@@ -112,21 +115,17 @@ body {
 }
 
 .tile {
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--tile-color);
+    background: #636e72;
     color: white;
     font-size: 24px;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
-    will-change: transform;
-    transition: transform var(--animation-duration) var(--animation-easing), 
-                background 0.2s ease;
-    animation: tileAppear 0.3s ease-out;
+    transition: transform 0.3s ease-out;
+    position: relative;
 }
 
 .tile:hover {
@@ -135,8 +134,6 @@ body {
 }
 
 .tile.empty {
-    background: transparent;
-    cursor: default;
     visibility: hidden;
 }
 
