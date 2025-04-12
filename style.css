@@ -1,144 +1,124 @@
+
 :root {
     --primary-color: #7a6ddf;
-    --secondary-color: #a29bfe;
-    --accent-color: #8f36bc;
-    --text-color: #1f1f1f;
-    --light-text: #ffffff;
     --tile-color: #a348ca;
     --bg-color: #f1f1f1;
-    --container-bg: #ffffff;
-    --container-shadow: rgba(0, 0, 0, 0.05);
-    --success-color: #4cad9a;
-    --animation-duration: 0.3s;
-    --animation-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --text-color: #1f1f1f;
+    --win-color: #4cad9a;
   }
   
-  /* === СБРОС === */
+  body.dark {
+    --bg-color: #1a1a1a;
+    --tile-color: #6d3fbf;
+    --text-color: #ffffff;
+    --primary-color: #c084fc;
+  }
+  
   * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg-color);
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
     user-select: none;
   }
   
-  /* === ОБОЛОЧКА === */
-  .app-container {
-    width: 100vw;
-    max-width: 420px;
-    height: 100vh;
-    background: var(--container-bg);
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    box-sizing: border-box;
-    box-shadow: 0 0 8px var(--container-shadow);
-    border-radius: 0;
+    min-height: 100vh;
   }
   
-  /* === ШАПКА === */
-  .game-header {
+  .app-container {
     width: 100%;
-    text-align: center;
-    margin-bottom: 10px;
+    max-width: 420px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   
   .game-header h1 {
-    margin: 0;
-    font-size: 24px;
+    text-align: center;
+    margin-bottom: 0.2em;
     color: var(--primary-color);
   }
   
   .stats-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    font-size: 14px;
-    margin-top: 8px;
+    margin-bottom: 10px;
   }
   
-  /* === КНОПКА === */
-  .new-game-btn {
-    padding: 10px 16px;
-    font-size: 15px;
-    border-radius: 10px;
-    background: var(--primary-color);
-    color: var(--light-text);
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .btn {
+    flex: 1;
+    padding: 10px;
     border: none;
+    background: var(--primary-color);
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.2s;
   }
   
-  .new-game-btn:hover {
-    background: var(--secondary-color);
+  .btn:hover {
     transform: scale(1.03);
   }
   
-  /* === ПОЛЕ === */
   .tiles-container {
     width: 100%;
     aspect-ratio: 1;
     background: var(--bg-color);
-    border-radius: 20px;
     position: relative;
+    border-radius: 10px;
     overflow: hidden;
-    margin: 20px 0;
   }
   
-  /* === ПЛИТКИ === */
   .tile {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 25%;
     height: 25%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.8em;
-    font-weight: bold;
+    font-size: 2em;
     background: var(--tile-color);
-    color: var(--light-text);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform var(--animation-duration) var(--animation-easing),
-                background 0.2s ease, box-shadow 0.2s ease;
-    will-change: transform;
-    z-index: 1;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
   
-  .tile:hover {
-    background: var(--accent-color);
-    transform: scale(1.05) translateZ(0);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  .tile.bounce {
+    animation: bounce 0.4s ease;
   }
   
-  .tile.empty {
-    visibility: hidden;
-    background: transparent;
-    box-shadow: none;
-    cursor: default;
+  @keyframes bounce {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.2); }
+    100% { transform: scale(1); }
   }
   
-  /* === СООБЩЕНИЯ === */
+  @keyframes explode {
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) rotate(720deg) scale(0);
+    }
+  }
+  
   .message-container {
     text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--success-color);
+    font-size: 18px;
+    color: var(--win-color);
     min-height: 24px;
   }
   

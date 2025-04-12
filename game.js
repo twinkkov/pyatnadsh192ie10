@@ -1,39 +1,63 @@
-const tgWebApp = window.Telegram && window.Telegram.WebApp;
+const tgWebApp = window.Telegram?.WebApp;
 if (tgWebApp) {
   tgWebApp.ready();
   tgWebApp.expand();
+
+  if (tgWebApp.themeParams.bg_color?.includes('#') && tgWebApp.themeParams.bg_color !== '#ffffff') {
+    document.body.classList.add("dark");
+  }
+
+  if (tgWebApp.initDataUnsafe?.user?.first_name) {
+    document.getElementById("greeting").textContent = `Привет, ${tgWebApp.initDataUnsafe.user.first_name}!`;
+  }
 }
+
+const boardElement = document.getElementById('board');
+const movesElement = document.getElementById('moves');
+const timerElement = document.getElementById('timer');
+const messageElement = document.getElementById('message');
+const newGameBtn = document.getElementById('new-game');
+const undoBtn = document.getElementById('undo');
 
 let board = [];
 let emptyPos = { row: 3, col: 3 };
 let moves = 0;
+let timer = 0;
+let timerInterval;
 let isAnimating = false;
 let tileElements = {};
-const boardElement = document.getElementById('board');
-const movesElement = document.getElementById('moves');
-const messageElement = document.getElementById('message');
-const newGameBtn = document.getElementById('new-game');
+let history = [];
 
-// 🎵 Звук при клике
-const clickSound = new Audio();
-clickSound.src = 'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA...'; // здесь можно вставить свой base64 звук
-clickSound.volume = 0.5;
+// 🔊 Звуки
+const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3');
+const winSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bonus-earned-in-video-game-2058.mp3');
+const errorSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timer = 0;
+  timerInterval = setInterval(() => {
+    timer++;
+    const mins = String(Math.floor(timer / 60)).padStart(2, '0');
+    const secs = String(timer % 60).padStart(2, '0');
+    timerElement.textContent = `${mins}:${secs}`;
+  }, 1000);
+}
 
 function initGame() {
   const numbers = Array.from({ length: 15 }, (_, i) => i + 1);
-  do {
-    shuffle(numbers);
-  } while (!isSolvable(numbers));
+  do shuffle(numbers);
+  while (!isSolvable(numbers));
 
   board = [];
-  for (let i = 0; i < 4; i++) {
-    board.push(numbers.slice(i * 4, i * 4 + 4));
-  }
+  for (let i = 0; i < 4; i++) board.push(numbers.slice(i * 4, i * 4 + 4));
   board[3][3] = 0;
   emptyPos = { row: 3, col: 3 };
   moves = 0;
+  history = [];
   movesElement.textContent = moves;
   messageElement.textContent = '';
+  startTimer();
   createTiles();
   updateTilePositions();
 }
@@ -65,7 +89,6 @@ function createTiles() {
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.textContent = value;
-      tile.dataset.value = value;
       boardElement.appendChild(tile);
       tileElements[value] = tile;
     }
@@ -86,30 +109,48 @@ function updateTilePositions() {
 
 function handleTileClick(row, col) {
   if (isAnimating) return;
+
   const dr = Math.abs(row - emptyPos.row);
   const dc = Math.abs(col - emptyPos.col);
-  if (dr + dc !== 1) return;
+  if (dr + dc !== 1) {
+    errorSound.play();
+    return;
+  }
 
   const value = board[row][col];
+  history.push({
+    board: board.map(row => [...row]),
+    emptyPos: { ...emptyPos }
+  });
+
   board[emptyPos.row][emptyPos.col] = value;
   board[row][col] = 0;
   emptyPos = { row, col };
   moves++;
   movesElement.textContent = moves;
 
-  // 🔊 звук
   clickSound.currentTime = 0;
-  clickSound.play().catch(() => {});
+  clickSound.play();
 
   isAnimating = true;
-  updateTilePositions();
-
+  const tile = tileElements[value];
+  tile.classList.add('bounce');
   setTimeout(() => {
+    tile.classList.remove('bounce');
+    updateTilePositions();
     isAnimating = false;
-    if (checkWin()) {
-      messageElement.textContent = 'Поздравляем! Вы выиграли!';
-    }
-  }, 310);
+    if (checkWin()) winSequence();
+  }, 300);
+}
+
+function undoMove() {
+  if (!history.length || isAnimating) return;
+  const last = history.pop();
+  board = last.board.map(row => [...row]);
+  emptyPos = { ...last.emptyPos };
+  moves--;
+  movesElement.textContent = moves;
+  updateTilePositions();
 }
 
 function checkWin() {
@@ -120,5 +161,20 @@ function checkWin() {
   return true;
 }
 
-newGameBtn.addEventListener('click', initGame);
+function winSequence() {
+  clearInterval(timerInterval);
+  messageElement.textContent = '🎉 Победа!';
+  winSound.play();
+  const tiles = Object.values(tileElements);
+  tiles.forEach(tile => {
+    const dx = Math.random() * 400 - 200 + 'px';
+    const dy = Math.random() * 400 - 200 + 'px';
+    tile.style.setProperty('--dx', dx);
+    tile.style.setProperty('--dy', dy);
+    tile.style.animation = 'explode 0.8s ease forwards';
+  });
+}
+
+newGameBtn.onclick = initGame;
+undoBtn.onclick = undoMove;
 document.addEventListener('DOMContentLoaded', initGame);
