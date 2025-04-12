@@ -65,24 +65,27 @@ function initGame() {
 
 function renderBoard() {
     boardElement.innerHTML = '';
-    
+
     // Создаем контейнер для плиток
     const container = document.createElement('div');
     container.className = 'tiles-container';
     boardElement.appendChild(container);
-    
+
     board.forEach((row, i) => {
         row.forEach((value, j) => {
             const tile = document.createElement('div');
             tile.className = value === 0 ? 'tile empty' : 'tile';
-            
+
             if (value !== 0) {
                 tile.textContent = value;
                 tile.dataset.row = i;
                 tile.dataset.col = j;
+                tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
                 tile.addEventListener('click', () => handleTileClick(i, j));
+            } else {
+                tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
             }
-            
+
             container.appendChild(tile);
         });
     });
@@ -110,17 +113,12 @@ function handleTileClick(row, col) {
 
     // Применяем анимацию
     tile.style.transition = 'transform 0.3s ease-out';
-    tile.style.transform = `translate(${dx * 100}%, ${dy * 100}%)`;
+    tile.style.transform = `translate(${(emptyPos.col) * 100}%, ${(emptyPos.row) * 100}%)`;
 
     setTimeout(() => {
         // Обновляем состояние
         board[emptyPos.row][emptyPos.col] = board[row][col];
         board[row][col] = 0;
-
-        // Обновляем DOM
-        tile.style.transform = '';
-        tile.dataset.row = emptyPos.row;
-        tile.dataset.col = emptyPos.col;
 
         emptyPos = { row, col };
         moves++;
