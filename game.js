@@ -53,6 +53,16 @@ function initGame() {
     renderBoard();
 }
 
+function isSolvable(numbers) {
+    let inversions = 0;
+    for (let i = 0; i < numbers.length; i++) {
+        for (let j = i + 1; j < numbers.length; j++) {
+            if (numbers[i] > numbers[j]) inversions++;
+        }
+    }
+    return inversions % 2 === 0;
+}
+
 function renderBoard() {
     boardElement.innerHTML = '';
     
@@ -118,4 +128,4 @@ function handleTileClick(row, col) {
 // ...
 
 newGameBtn.addEventListener('click', initGame);
-document.addEventListener('DOMContentLoaded', initGame);    
+document.addEventListener('DOMContentLoaded', initGame);
