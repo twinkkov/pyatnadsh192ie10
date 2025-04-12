@@ -64,19 +64,18 @@ body {
 }
 
 .new-game-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    color: white;
-    font-weight: 500;
+    padding: 6px 12px;
     font-size: 14px;
+    border-radius: 6px;
+    background: var(--primary-color);
+    color: var(--light-text);
+    border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.3s ease;
 }
 
 .new-game-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--secondary-color);
 }
 
 .game-board {
@@ -87,14 +86,14 @@ body {
 }
 
 .tiles-container {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 1;
-    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1;
+    margin: 0 auto;
 }
 
 .tiles-grid {
@@ -119,24 +118,22 @@ body {
 }
 
 .tile {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    aspect-ratio: 1;
+    font-size: 1.5em;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--light-text);
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #7a6ddf;
-    color: white;
-    font-size: 2em;
-    font-weight: bold;
-    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background 0.3s ease;
     cursor: pointer;
-    transition: transform 0.3s ease-out, background 0.2s ease;
 }
 
 .tile:hover {
-    transform: scale(1.02);
-    background: var(--primary-color);
+    transform: scale(1.05);
+    background: var(--accent-color);
 }
 
 .tile.empty {
