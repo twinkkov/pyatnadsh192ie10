@@ -10,16 +10,15 @@
     --container-shadow: rgba(0, 0, 0, 0.1);
     --success-color: #4cad9a;
     --animation-duration: 0.3s;
-    --animation-duration-long: 0.5s;
     --animation-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
     --tile-fade-duration: 0.5s;
-}
-
-* {
+  }
+  
+  * {
     box-sizing: border-box;
-}
-
-body {
+  }
+  
+  body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     margin: 0;
@@ -28,9 +27,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.app-container {
+  }
+  
+  .app-container {
     width: 100%;
     max-width: 600px;
     background: var(--container-bg);
@@ -43,32 +42,32 @@ body {
     flex-direction: column;
     align-items: center;
     transition: transform 0.3s;
-}
-
-.app-container:hover {
+  }
+  
+  .app-container:hover {
     transform: scale(1.02);
-}
-
-.game-header {
+  }
+  
+  .game-header {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.game-header h1 {
+  }
+  
+  .game-header h1 {
     margin: 0;
     font-size: 2.5em;
     color: var(--primary-color);
-}
-
-.stats-container {
+  }
+  
+  .stats-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-top: 10px;
-}
-
-.new-game-btn {
+  }
+  
+  .new-game-btn {
     padding: 8px 16px;
     font-size: 14px;
     border-radius: 8px;
@@ -77,14 +76,15 @@ body {
     border: none;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.new-game-btn:hover {
+  }
+  
+  .new-game-btn:hover {
     background: var(--secondary-color);
     transform: scale(1.05);
-}
-
-.tiles-container {
+  }
+  
+  /* Контейнер для плиток */
+  .tiles-container {
     width: min(400px, 90vw);
     aspect-ratio: 1; 
     background: var(--bg-color);
@@ -92,9 +92,10 @@ body {
     position: relative;
     overflow: hidden;
     margin: 20px 0;
-}
-
-.tile {
+  }
+  
+  /* Каждая плитка позиционируется абсолютно от (0,0) */
+  .tile {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -113,34 +114,35 @@ body {
     height: 25%;
     
     transition: transform var(--animation-duration) var(--animation-easing),
-                background var(--animation-duration) ease, 
+                background var(--animation-duration) ease,
                 opacity var(--tile-fade-duration) ease;
     opacity: 0;
-    animation: fadeIn 0.5s forwards;
-}
-
-@keyframes fadeIn {
+    animation: fadeIn var(--tile-fade-duration) forwards;
+  }
+  
+  @keyframes fadeIn {
     to {
-        opacity: 1;
+      opacity: 1;
     }
-}
-
-.tile:hover {
+  }
+  
+  .tile:hover {
     transform: scale(1.05);
     background: var(--accent-color);
-}
-
-.tile.empty {
+  }
+  
+  .tile.empty {
     visibility: hidden;
     background: transparent;
     box-shadow: none;
     cursor: default;
-}
-
-.message-container {
+  }
+  
+  .message-container {
     text-align: center;
     margin-top: 20px;
     font-size: 18px;
     color: var(--success-color);
     font-weight: bold;
-}
+  }
+  
