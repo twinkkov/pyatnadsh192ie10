@@ -25,12 +25,12 @@ body {
 
 .app-container {
     width: 100%;
-    max-width: 600px;
+    max-width: 601px;
     background: #b483cf;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    padding: 20px;
+    padding: 50px;
 }
 
 .game-header {
