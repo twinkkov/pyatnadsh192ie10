@@ -21,14 +21,20 @@
     <div class="content" style="display: none;">
         <div class="app-container">
             <header class="game-header">
-                <h1>Пятнашки</h1>
+                <h1>Memory Game</h1>
                 <div class="stats-container">
-                    <div class="moves-counter">Ходы: <span id="moves">0</span></div>
-                    <button id="new-game" class="new-game-btn">Новая игра</button>
+                    <div class="moves-counter">Moves: <span>0</span></div>
+                    <button class="new-game-btn">New Game</button>
                 </div>
             </header>
-            <div id="board" class="tiles-container"></div>
-            <div id="message" class="message-container"></div>
+            <div class="game-board">
+                <div class="tiles-container">
+                    <div class="tiles-grid" id="tiles-grid">
+                        <!-- Tiles will be generated here -->
+                    </div>
+                </div>
+            </div>
+            <div class="message-container"></div>
         </div>
     </div>
 
