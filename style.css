@@ -89,11 +89,11 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 5px; /* Уменьшаем расстояние между плитками */
+    gap: 10px; /* Увеличиваем расстояние между плитками */
     width: 100%;
-    max-width: 500px; /* Увеличиваем максимальный размер */
+    max-width: 400px; /* Ограничиваем максимальный размер */
     aspect-ratio: 1;
-    position: relative;
+    margin: 0 auto; /* Центрируем контейнер */
 }
 
 .tiles-grid {
@@ -118,7 +118,6 @@ body {
 }
 
 .tile {
-    position: relative; /* Плитки остаются в сетке */
     width: 100%; /* Плитки занимают всю ячейку */
     height: 100%; /* Плитки занимают всю ячейку */
     display: flex;
@@ -126,7 +125,7 @@ body {
     align-items: center;
     background: #636e72;
     color: white;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;

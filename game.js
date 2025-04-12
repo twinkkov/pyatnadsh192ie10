@@ -126,8 +126,9 @@ function handleTileClick(row, col) {
         moves++;
         movesElement.textContent = moves;
 
+        renderBoard(); // Перерисовываем доску для обновления позиций
+
         setTimeout(() => {
-            tile.style.transition = '';
             isAnimating = false;
             checkWin();
         }, 50);
