@@ -31,12 +31,27 @@
           <option value="5">Поле 5x5</option>
         </select>
         <button id="toggle-theme" class="btn">🌙 / ☀️</button>
+        <button id="open-shop" class="btn">🛍️ Магазин</button>
       </div>
     </header>
 
     <div id="board" class="tiles-container"></div>
     <div id="message" class="message-container"></div>
   </div>
+
+  <!-- Магазин -->
+  <div id="shop-modal" class="shop-modal hidden">
+    <div class="shop-content">
+      <h2>Магазин блоков</h2>
+      <div class="shop-grid" id="skin-options">
+        <!-- Динамически генерируется -->
+      </div>
+      <button id="close-shop" class="btn">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Конфетти -->
+  <canvas id="confetti-canvas"></canvas>
 
   <script src="game.js"></script>
 </body>

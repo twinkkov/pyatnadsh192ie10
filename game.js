@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.body.classList.add('loaded');
     applySavedTheme();
+    loadSkin();
     restoreGame() || initGame();
   }, 1000);
 });
@@ -29,6 +30,10 @@ const undoBtn = document.getElementById('undo');
 const coinsElement = document.getElementById('coins');
 const sizeSelector = document.getElementById('size-selector');
 const themeToggle = document.getElementById('toggle-theme');
+const shopBtn = document.getElementById('open-shop');
+const shopModal = document.getElementById('shop-modal');
+const skinGrid = document.getElementById('skin-options');
+const closeShopBtn = document.getElementById('close-shop');
 
 let board = [];
 let emptyPos = { row: 3, col: 3 };
@@ -40,6 +45,7 @@ let tileElements = {};
 let history = [];
 let size = +localStorage.getItem("size") || 4;
 let coins = +localStorage.getItem("coins") || 0;
+let selectedSkin = localStorage.getItem("skin") || "default";
 
 const soundWin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_2d24f4a726.mp3");
 
@@ -63,7 +69,7 @@ function stopTimer() {
 }
 
 function saveGame() {
-  const save = { board, emptyPos, moves, timer, size };
+  const save = { board, emptyPos, moves, timer, size, selectedSkin };
   localStorage.setItem("pyatnashki-save", JSON.stringify(save));
 }
 
@@ -73,6 +79,7 @@ function restoreGame() {
   try {
     const data = JSON.parse(saved);
     size = data.size || 4;
+    selectedSkin = data.selectedSkin || "default";
     sizeSelector.value = size;
     board = data.board;
     emptyPos = data.emptyPos;
@@ -92,6 +99,16 @@ function restoreGame() {
   }
 }
 
+function applySavedTheme() {
+  const theme = localStorage.getItem('theme') || 'light';
+  document.body.classList.toggle('dark', theme === 'dark');
+}
+
+themeToggle?.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+  localStorage.setItem('theme', theme);
+});
 function initGame() {
   const total = size * size - 1;
   const numbers = Array.from({ length: total }, (_, i) => i + 1);
@@ -140,6 +157,8 @@ function createTiles() {
       tile.className = 'tile';
       tile.style.width = tileSize;
       tile.style.height = tileSize;
+
+      tile.style.background = selectedSkin === 'default' ? 'var(--tile-color)' : selectedSkin;
       if (value === 0) {
         tile.classList.add('empty');
         continue;
@@ -209,6 +228,14 @@ function handleTileClick(row, col) {
   }, 300);
 }
 
+function checkWin() {
+  const flat = board.flat();
+  for (let i = 0; i < flat.length - 1; i++) {
+    if (flat[i] !== i + 1) return false;
+  }
+  return flat[flat.length - 1] === 0;
+}
+
 function showVictory() {
   stopTimer();
   soundWin.play().catch(() => {});
@@ -216,15 +243,8 @@ function showVictory() {
   messageElement.style.opacity = '1';
   coins += 10;
   updateCoinsDisplay();
+  launchConfetti();
   localStorage.removeItem("pyatnashki-save");
-}
-
-function checkWin() {
-  const flat = board.flat();
-  for (let i = 0; i < flat.length - 1; i++) {
-    if (flat[i] !== i + 1) return false;
-  }
-  return flat[flat.length - 1] === 0;
 }
 
 function undoMove() {
@@ -236,12 +256,82 @@ function undoMove() {
   movesElement.textContent = moves;
   updateTilePositions();
 }
+// 🎊 Конфетти по углам
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const confetti = [];
 
-function applySavedTheme() {
-  const theme = localStorage.getItem('theme') || 'light';
-  document.body.classList.toggle('dark', theme === 'dark');
+  for (let i = 0; i < 150; i++) {
+    confetti.push({
+      x: Math.random() * W,
+      y: Math.random() * H - H,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 100,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      tilt: Math.floor(Math.random() * 10) - 10
+    });
+  }
+
+  let angle = 0;
+  const interval = setInterval(() => {
+    ctx.clearRect(0, 0, W, H);
+    angle += 0.01;
+    confetti.forEach(c => {
+      c.y += Math.cos(angle + c.d) + 1 + c.r / 2;
+      c.x += Math.sin(angle) * 2;
+      ctx.beginPath();
+      ctx.fillStyle = c.color;
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }, 20);
+
+  setTimeout(() => clearInterval(interval), 3000);
 }
 
+// 🎨 Магазин блоков
+const availableSkins = {
+  "default": "var(--tile-color)",
+  "#ff6b6b": "#ff6b6b",
+  "#4ecdc4": "#4ecdc4",
+  "#ffe66d": "#ffe66d",
+  "#1a535c": "#1a535c",
+  "#c084fc": "#c084fc",
+};
+
+function loadSkin() {
+  if (!skinGrid) return;
+  skinGrid.innerHTML = '';
+
+  Object.entries(availableSkins).forEach(([key, color]) => {
+    const div = document.createElement('div');
+    div.className = 'skin-option';
+    div.style.background = color;
+    if (key === selectedSkin) div.classList.add('selected');
+    div.onclick = () => {
+      if (coins < 20 && key !== 'default') {
+        alert('Недостаточно монет (нужно 20)');
+        return;
+      }
+      selectedSkin = key;
+      localStorage.setItem("skin", selectedSkin);
+      createTiles();
+      updateTilePositions();
+      document.querySelectorAll('.skin-option').forEach(e => e.classList.remove('selected'));
+      div.classList.add('selected');
+      if (key !== 'default') {
+        coins -= 20;
+        updateCoinsDisplay();
+      }
+    };
+    skinGrid.appendChild(div);
+  });
+}
+
+// 📦 Подключение кнопок
 themeToggle?.addEventListener('click', () => {
   document.body.classList.toggle('dark');
   const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
@@ -254,6 +344,14 @@ sizeSelector?.addEventListener('change', () => {
   initGame();
 });
 
-window.addEventListener('beforeunload', saveGame);
+shopBtn?.addEventListener('click', () => {
+  shopModal.classList.remove('hidden');
+});
+
+closeShopBtn?.addEventListener('click', () => {
+  shopModal.classList.add('hidden');
+});
+
 newGameBtn?.addEventListener('click', initGame);
 undoBtn?.addEventListener('click', undoMove);
+window.addEventListener('beforeunload', saveGame);
