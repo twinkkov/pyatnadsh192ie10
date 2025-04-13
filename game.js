@@ -1,25 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.body.classList.add('loaded');
-    initGame();
+    restoreGame() || initGame();
   }, 1000);
 });
 
-const tgWebApp = window.Telegram?.WebApp;
-if (tgWebApp) {
-  tgWebApp.ready();
-  tgWebApp.expand();
+// Telegram WebApp
+const tg = window.Telegram?.WebApp;
+let userName = 'игрок';
 
-  const greetingEl = document.getElementById("greeting");
-  if (tgWebApp.initDataUnsafe?.user?.first_name && greetingEl) {
-    greetingEl.textContent = `Привет, ${tgWebApp.initDataUnsafe.user.first_name}!`;
+if (tg) {
+  tg.ready();
+  tg.expand();
+
+  const name = tg.initDataUnsafe?.user?.first_name;
+  if (name) {
+    userName = name;
+    const greeting = document.getElementById("greeting");
+    if (greeting) greeting.textContent = `Привет, ${userName}!`;
   }
 
-  if (tgWebApp.themeParams.bg_color?.includes('#') && tgWebApp.themeParams.bg_color !== '#ffffff') {
+  if (tg.themeParams?.bg_color?.includes('#') && tg.themeParams.bg_color !== '#ffffff') {
     document.body.classList.add("dark");
   }
 }
 
+// DOM
 const boardElement = document.getElementById('board');
 const movesElement = document.getElementById('moves');
 const timerElement = document.getElementById('timer');
@@ -36,23 +42,54 @@ let isAnimating = false;
 let tileElements = {};
 let history = [];
 
+const soundWin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_2d24f4a726.mp3"); // фанфары
+
 function startTimer() {
   clearInterval(timerInterval);
-  timer = 0;
   timerInterval = setInterval(() => {
     timer++;
     const mins = String(Math.floor(timer / 60)).padStart(2, '0');
     const secs = String(timer % 60).padStart(2, '0');
-    if (timerElement) {
-      timerElement.textContent = `${mins}:${secs}`;
-    }
+    timerElement.textContent = `${mins}:${secs}`;
   }, 1000);
+}
+
+function saveGame() {
+  const save = {
+    board,
+    emptyPos,
+    moves,
+    timer
+  };
+  localStorage.setItem("pyatnashki-save", JSON.stringify(save));
+}
+
+function restoreGame() {
+  const saved = localStorage.getItem("pyatnashki-save");
+  if (!saved) return false;
+  try {
+    const data = JSON.parse(saved);
+    board = data.board;
+    emptyPos = data.emptyPos;
+    moves = data.moves;
+    timer = data.timer;
+    history = [];
+    movesElement.textContent = moves;
+    timerElement.textContent = '...'; // отрисуется через таймер
+    messageElement.textContent = '';
+    messageElement.style.opacity = '0';
+    startTimer();
+    createTiles();
+    updateTilePositions();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function initGame() {
   const numbers = Array.from({ length: 15 }, (_, i) => i + 1);
-  do shuffle(numbers);
-  while (!isSolvable(numbers));
+  do shuffle(numbers); while (!isSolvable(numbers));
 
   board = [];
   for (let i = 0; i < 4; i++) board.push(numbers.slice(i * 4, i * 4 + 4));
@@ -60,11 +97,10 @@ function initGame() {
   emptyPos = { row: 3, col: 3 };
   moves = 0;
   history = [];
-  if (movesElement) movesElement.textContent = moves;
-  if (messageElement) {
-    messageElement.textContent = '';
-    messageElement.style.opacity = '0';
-  }
+  movesElement.textContent = moves;
+  messageElement.textContent = '';
+  messageElement.style.opacity = '0';
+  timer = 0;
   startTimer();
   createTiles();
   updateTilePositions();
@@ -129,7 +165,7 @@ function handleTileClick(row, col) {
 
   const value = board[row][col];
   history.push({
-    board: board.map(row => [...row]),
+    board: board.map(r => [...r]),
     emptyPos: { ...emptyPos }
   });
 
@@ -137,36 +173,36 @@ function handleTileClick(row, col) {
   board[row][col] = 0;
   emptyPos = { row, col };
   moves++;
-  if (movesElement) movesElement.textContent = moves;
+  movesElement.textContent = moves;
 
   isAnimating = true;
   updateTilePositions();
   setTimeout(() => {
     isAnimating = false;
-    if (checkWin() && messageElement) {
-      messageElement.textContent = "🎉 Победа!";
-      messageElement.style.opacity = '1';
-    }
+    if (checkWin()) showVictory();
   }, 300);
+}
+
+function showVictory() {
+  soundWin.play().catch(() => {}); // на всякий
+  messageElement.textContent = `🎉 Поздравляем, ${userName}!`;
+  messageElement.style.opacity = '1';
+  localStorage.removeItem("pyatnashki-save");
 }
 
 function undoMove() {
   if (!history.length || isAnimating) return;
   const last = history.pop();
-  board = last.board.map(row => [...row]);
+  board = last.board.map(r => [...r]);
   emptyPos = { ...last.emptyPos };
   moves--;
-  if (movesElement) movesElement.textContent = moves;
+  movesElement.textContent = moves;
   updateTilePositions();
 }
 
-function checkWin() {
-  const flat = board.flat();
-  for (let i = 0; i < 15; i++) {
-    if (flat[i] !== i + 1) return false;
-  }
-  return true;
-}
+// автосохранение при уходе
+window.addEventListener('beforeunload', saveGame);
 
+// кнопки
 newGameBtn?.addEventListener('click', initGame);
 undoBtn?.addEventListener('click', undoMove);
