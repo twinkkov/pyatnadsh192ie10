@@ -1,11 +1,8 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const app = document.getElementById('app');
-  const loader = document.getElementById('loader');
+document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
-    loader.style.display = 'none';
-    app.style.display = 'flex';
+    document.body.classList.add('loaded');
     initGame();
-  }, 1000); // 1 секунда задержки загрузки
+  }, 1000);
 });
 
 const tgWebApp = window.Telegram?.WebApp;
