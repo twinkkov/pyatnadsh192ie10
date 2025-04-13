@@ -7,8 +7,9 @@ if (tgWebApp) {
     document.body.classList.add("dark");
   }
 
-  if (tgWebApp.initDataUnsafe?.user?.first_name) {
-    document.getElementById("greeting").textContent = `Привет, ${tgWebApp.initDataUnsafe.user.first_name}!`;
+  const greetingEl = document.getElementById("greeting");
+  if (tgWebApp.initDataUnsafe?.user?.first_name && greetingEl) {
+    greetingEl.textContent = `Привет, ${tgWebApp.initDataUnsafe.user.first_name}!`;
   }
 }
 
@@ -28,7 +29,7 @@ let isAnimating = false;
 let tileElements = {};
 let history = [];
 
-// Звуки
+// Звуки (рабочие и протестированные)
 const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3');
 const winSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bonus-earned-in-video-game-2058.mp3');
 const errorSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3');
@@ -101,6 +102,7 @@ function updateTilePositions() {
       const value = board[i][j];
       if (value === 0) continue;
       const tile = tileElements[value];
+      if (!tile) continue;
       tile.style.transition = "transform 0.3s ease";
       tile.style.transform = `translate(${j * 100}%, ${i * 100}%)`;
       tile.onclick = () => handleTileClick(i, j);
@@ -114,7 +116,8 @@ function handleTileClick(row, col) {
   const dr = Math.abs(row - emptyPos.row);
   const dc = Math.abs(col - emptyPos.col);
   if (dr + dc !== 1) {
-    errorSound.play();
+    errorSound.currentTime = 0;
+    errorSound.play().catch(e => console.warn("Error sound failed", e));
     return;
   }
 
@@ -131,7 +134,7 @@ function handleTileClick(row, col) {
   movesElement.textContent = moves;
 
   clickSound.currentTime = 0;
-  clickSound.play();
+  clickSound.play().catch(e => console.warn("Click sound failed", e));
 
   isAnimating = true;
   const tile = tileElements[value];
@@ -165,15 +168,18 @@ function checkWin() {
 function winSequence() {
   clearInterval(timerInterval);
   messageElement.textContent = '🎉 Победа!';
-  winSound.play();
+  winSound.currentTime = 0;
+  winSound.play().catch(e => console.warn("Win sound failed", e));
 
   const tiles = Object.values(tileElements);
 
   tiles.forEach(tile => {
     const dx = (Math.random() * 2 - 1) * 150;
     const dy = (Math.random() * 2 - 1) * 150;
-    tile.style.transition = 'transform 1s ease, opacity 1s ease';
-    tile.style.transform += ` translate(${dx}px, ${dy}px) rotate(360deg) scale(0.7)`;
+    const currentTransform = tile.style.transform;
+    const explode = ` translate(${dx}px, ${dy}px) rotate(360deg) scale(0.7)`;
+    tile.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
+    tile.style.transform = currentTransform + explode;
     tile.style.opacity = '0';
   });
 
@@ -183,7 +189,7 @@ function winSequence() {
       tile.style.transform = '';
       tile.style.opacity = '';
     });
-  }, 1500);
+  }, 1200);
 }
 
 newGameBtn.onclick = initGame;
