@@ -301,6 +301,17 @@ const availableSkins = {
   "#c084fc": "#c084fc",
 };
 
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  toast.classList.remove('hidden');
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.classList.add('hidden');
+  }, 2000);
+}
+
 function loadSkin() {
   if (!skinGrid) return;
   skinGrid.innerHTML = '';
@@ -312,7 +323,7 @@ function loadSkin() {
     if (key === selectedSkin) div.classList.add('selected');
     div.onclick = () => {
       if (coins < 20 && key !== 'default') {
-        alert('Недостаточно монет (нужно 20)');
+        showToast('Недостаточно монет для покупки 😢');
         return;
       }
       selectedSkin = key;
