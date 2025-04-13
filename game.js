@@ -101,14 +101,13 @@ function restoreGame() {
 
 function applySavedTheme() {
   const theme = localStorage.getItem('theme') || 'light';
-  document.body.classList.toggle('dark', theme === 'dark');
+  if (theme === 'dark') {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
 }
 
-themeToggle?.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-  localStorage.setItem('theme', theme);
-});
 function initGame() {
   const total = size * size - 1;
   const numbers = Array.from({ length: total }, (_, i) => i + 1);
@@ -333,9 +332,10 @@ function loadSkin() {
 
 // 📦 Подключение кнопок
 themeToggle?.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-  localStorage.setItem('theme', theme);
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  createTiles();
+  updateTilePositions();
 });
 
 sizeSelector?.addEventListener('change', () => {
