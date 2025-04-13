@@ -12,14 +12,25 @@
   <div class="app-container" id="app">
     <header class="game-header">
       <h1>Пятнашки</h1>
-      <div class="greeting" id="greeting"></div>
+      <div class="greeting" id="greeting">Привет, игрок!</div>
+
       <div class="stats-container">
         <div>Ходы: <span id="moves">0</span></div>
         <div>Время: <span id="timer">00:00</span></div>
+        <div>💰 <span id="coins">0</span></div>
       </div>
+
       <div class="button-group">
         <button id="new-game" class="btn">Новая игра</button>
-        <button id="undo" class="btn">Отменить ход</button>
+        <button id="undo" class="btn">Отменить</button>
+      </div>
+
+      <div class="options-group">
+        <select id="size-selector" class="btn">
+          <option value="4">Поле 4x4</option>
+          <option value="5">Поле 5x5</option>
+        </select>
+        <button id="toggle-theme" class="btn">🌙 / ☀️</button>
       </div>
     </header>
 
