@@ -1,15 +1,25 @@
+window.addEventListener('DOMContentLoaded', () => {
+  const app = document.getElementById('app');
+  const loader = document.getElementById('loader');
+  setTimeout(() => {
+    loader.style.display = 'none';
+    app.style.display = 'flex';
+    initGame();
+  }, 1000); // 1 секунда задержки загрузки
+});
+
 const tgWebApp = window.Telegram?.WebApp;
 if (tgWebApp) {
   tgWebApp.ready();
   tgWebApp.expand();
 
-  if (tgWebApp.themeParams.bg_color?.includes('#') && tgWebApp.themeParams.bg_color !== '#ffffff') {
-    document.body.classList.add("dark");
-  }
-
   const greetingEl = document.getElementById("greeting");
   if (tgWebApp.initDataUnsafe?.user?.first_name && greetingEl) {
     greetingEl.textContent = `Привет, ${tgWebApp.initDataUnsafe.user.first_name}!`;
+  }
+
+  if (tgWebApp.themeParams.bg_color?.includes('#') && tgWebApp.themeParams.bg_color !== '#ffffff') {
+    document.body.classList.add("dark");
   }
 }
 
@@ -136,11 +146,9 @@ function handleTileClick(row, col) {
   updateTilePositions();
   setTimeout(() => {
     isAnimating = false;
-    if (checkWin()) {
-      if (messageElement) {
-        messageElement.textContent = "🎉 Победа!";
-        messageElement.style.opacity = '1';
-      }
+    if (checkWin() && messageElement) {
+      messageElement.textContent = "🎉 Победа!";
+      messageElement.style.opacity = '1';
     }
   }, 300);
 }
@@ -165,4 +173,3 @@ function checkWin() {
 
 newGameBtn?.addEventListener('click', initGame);
 undoBtn?.addEventListener('click', undoMove);
-document.addEventListener('DOMContentLoaded', initGame);

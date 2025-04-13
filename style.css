@@ -16,11 +16,11 @@ body.dark {
 * {
   box-sizing: border-box;
   user-select: none;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
   background: var(--bg-color);
   color: var(--text-color);
   font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -28,6 +28,17 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+}
+
+.loader {
+  font-size: 20px;
+  color: var(--primary-color);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .app-container {
@@ -41,7 +52,6 @@ body {
 
 .game-header h1 {
   text-align: center;
-  margin-bottom: 0.2em;
   color: var(--primary-color);
 }
 
@@ -94,14 +104,13 @@ body {
   color: white;
   border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-  transform: scale(0.9);
+  transform: var(--transform, scale(1)) scale(var(--scale, 1));
   opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition: transform 0.35s ease, opacity 0.4s ease;
   will-change: transform;
 }
 
 .tile.show {
-  transform: scale(1);
   opacity: 1;
 }
 
@@ -111,7 +120,7 @@ body {
 }
 
 .tile:active {
-  transform: scale(0.96) !important;
+  --scale: 0.96;
 }
 
 .message-container {
