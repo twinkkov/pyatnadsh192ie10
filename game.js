@@ -34,6 +34,8 @@ const shopBtn = document.getElementById('open-shop');
 const shopModal = document.getElementById('shop-modal');
 const skinGrid = document.getElementById('skin-options');
 const closeShopBtn = document.getElementById('close-shop');
+const devBtn = document.getElementById('dev-button');
+const autoBtn = document.getElementById('auto-solve');
 
 let board = [];
 let emptyPos = { row: 3, col: 3 };
@@ -340,6 +342,37 @@ function loadSkin() {
     skinGrid.appendChild(div);
   });
 }
+
+function solve() {
+  board = [];
+  let count = 1;
+  for (let i = 0; i < size; i++) {
+    board[i] = [];
+    for (let j = 0; j < size; j++) {
+      board[i][j] = count++;
+    }
+  }
+  board[size - 1][size - 1] = 0;
+  emptyPos = { row: size - 1, col: size - 1 };
+  createTiles();
+  updateTilePositions();
+  setTimeout(() => {
+    showVictory();
+  }, 300);
+}
+
+// 🔐 Чит-доступ
+devBtn?.addEventListener('click', () => {
+  const input = prompt('Введите пароль для доступа:');
+  if (input === '727666') {
+    autoBtn.classList.remove('hidden');
+    showToast('🧠 Чит-режим активирован!');
+  } else {
+    showToast('❌ Неверный пароль');
+  }
+});
+
+autoBtn?.addEventListener('click', solve);
 
 // 📦 Подключение кнопок
 themeToggle?.addEventListener('click', () => {

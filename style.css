@@ -235,3 +235,26 @@ h1 {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* Секретный чит-блок */
+.dev-btn {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  z-index: 999;
+  opacity: 0.5;
+}
+
+.dev-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+#auto-solve.hidden {
+  display: none;
+}
