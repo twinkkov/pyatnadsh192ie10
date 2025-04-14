@@ -258,3 +258,18 @@ h1 {
 #auto-solve.hidden {
   display: none;
 }
+
+#auto-solve {
+  position: fixed;
+  bottom: 60px;
+  right: 10px;
+  z-index: 999;
+  font-size: 14px;
+  padding: 10px 14px;
+  background: var(--win-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}

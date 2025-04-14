@@ -35,7 +35,6 @@ const shopModal = document.getElementById('shop-modal');
 const skinGrid = document.getElementById('skin-options');
 const closeShopBtn = document.getElementById('close-shop');
 const devBtn = document.getElementById('dev-button');
-const autoBtn = document.getElementById('auto-solve');
 
 let board = [];
 let emptyPos = { row: 3, col: 3 };
@@ -365,14 +364,18 @@ function solve() {
 devBtn?.addEventListener('click', () => {
   const input = prompt('Введите пароль для доступа:');
   if (input === '727666') {
-    autoBtn.classList.remove('hidden');
-    showToast('🧠 Чит-режим активирован!');
+    if (!document.getElementById('auto-solve')) {
+      const autoBtn = document.createElement('button');
+      autoBtn.id = 'auto-solve';
+      autoBtn.textContent = '🧠 Автопрохождение';
+      document.body.appendChild(autoBtn);
+      autoBtn.addEventListener('click', solve);
+      showToast('🧠 Чит-режим активирован!');
+    }
   } else {
     showToast('❌ Неверный пароль');
   }
 });
-
-autoBtn?.addEventListener('click', solve);
 
 // 📦 Подключение кнопок
 themeToggle?.addEventListener('click', () => {
