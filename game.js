@@ -267,7 +267,7 @@ function launchConfetti() {
   for (let i = 0; i < 150; i++) {
     confetti.push({
       x: Math.random() * W,
-      y: Math.random() * H - H,
+      y: Math.random() * -H,
       r: Math.random() * 6 + 4,
       d: Math.random() * 100,
       color: `hsl(${Math.random() * 360}, 100%, 50%)`,
@@ -276,9 +276,13 @@ function launchConfetti() {
   }
 
   let angle = 0;
+  let frame = 0;
+  const maxFrames = 120;
+
   const interval = setInterval(() => {
     ctx.clearRect(0, 0, W, H);
     angle += 0.01;
+    frame++;
     confetti.forEach(c => {
       c.y += Math.cos(angle + c.d) + 1 + c.r / 2;
       c.x += Math.sin(angle) * 2;
@@ -287,9 +291,12 @@ function launchConfetti() {
       ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
       ctx.fill();
     });
-  }, 20);
 
-  setTimeout(() => clearInterval(interval), 3000);
+    if (frame > maxFrames) {
+      clearInterval(interval);
+      ctx.clearRect(0, 0, W, H);
+    }
+  }, 16);
 }
 
 // 🎨 Магазин блоков
@@ -353,6 +360,11 @@ function solve() {
   }
   board[size - 1][size - 1] = 0;
   emptyPos = { row: size - 1, col: size - 1 };
+  history = [];
+  moves = 0;
+  timer = 0;
+  movesElement.textContent = '0';
+  timerElement.textContent = '00:00';
   createTiles();
   updateTilePositions();
   setTimeout(() => {
