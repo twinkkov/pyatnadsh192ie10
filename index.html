@@ -39,15 +39,11 @@
     <div id="message" class="message-container"></div>
   </div>
 
-  <div id="toast" class="toast hidden">Недостаточно монет 😢</div>
-
   <!-- Магазин -->
   <div id="shop-modal" class="shop-modal hidden">
     <div class="shop-content">
       <h2>Магазин блоков</h2>
-      <div class="shop-grid" id="skin-options">
-        <!-- Динамически генерируется -->
-      </div>
+      <div class="shop-grid" id="skin-options"></div>
       <button id="close-shop" class="btn">Закрыть</button>
     </div>
   </div>
@@ -55,8 +51,35 @@
   <!-- Конфетти -->
   <canvas id="confetti-canvas"></canvas>
 
-  <!-- Секретный чит-блок -->
+  <!-- Уведомление -->
+  <div id="toast" class="toast hidden">Недостаточно монет 😢</div>
+
+  <!-- 🤖 Кнопка -->
   <div id="dev-button" class="dev-btn">🤖</div>
+
+  <!-- 🔐 Ввод пароля -->
+  <div id="cheat-password" class="modal hidden">
+    <div class="modal-content">
+      <h3>Введите пароль</h3>
+      <input type="password" id="cheat-input" placeholder="Пароль..."/>
+      <button id="cheat-enter" class="btn">Войти</button>
+    </div>
+  </div>
+
+  <!-- 🧠 Меню читов -->
+  <div id="cheat-menu" class="modal hidden">
+    <div class="modal-content">
+      <h3>Чит-меню</h3>
+      <button class="btn cheat-btn" data-action="solve">🧠 Автопрохождение</button>
+      <button class="btn cheat-btn" data-action="coins">💰 +100 монет</button>
+      <button class="btn cheat-btn" data-action="shuffle">🔀 Перемешать</button>
+      <button class="btn cheat-btn" data-action="dark">🌑 Тёмная тема</button>
+      <button class="btn cheat-btn" data-action="light">🌞 Светлая тема</button>
+      <button class="btn cheat-btn" data-action="field5">📏 Сделать поле 5x5</button>
+      <button class="btn cheat-btn" data-action="skin">🎨 Применить скин бесплатно</button>
+      <button class="btn cheat-btn" id="close-cheat">❌ Закрыть</button>
+    </div>
+  </div>
 
   <script src="game.js"></script>
 </body>

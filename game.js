@@ -402,3 +402,87 @@ closeShopBtn?.addEventListener('click', () => {
 newGameBtn?.addEventListener('click', initGame);
 undoBtn?.addEventListener('click', undoMove);
 window.addEventListener('beforeunload', saveGame);
+// ========== ЧИТ-МЕНЮ ==========
+
+const cheatBtn = document.getElementById('dev-button');
+const cheatModal = document.getElementById('cheat-password');
+const cheatInput = document.getElementById('cheat-input');
+const cheatEnter = document.getElementById('cheat-enter');
+const cheatMenu = document.getElementById('cheat-menu');
+const closeCheat = document.getElementById('close-cheat');
+
+// 🤖 Показать поле ввода пароля
+cheatBtn?.addEventListener('click', () => {
+  cheatModal.classList.remove('hidden');
+  cheatInput.value = '';
+  cheatInput.focus();
+});
+
+// ✅ Ввод пароля
+cheatEnter?.addEventListener('click', () => {
+  if (cheatInput.value === '727666') {
+    cheatModal.classList.add('hidden');
+    cheatMenu.classList.remove('hidden');
+    showToast('🧠 Чит-режим активирован!');
+  } else {
+    showToast('❌ Неверный пароль');
+  }
+});
+
+// ❌ Закрыть меню
+closeCheat?.addEventListener('click', () => {
+  cheatMenu.classList.add('hidden');
+});
+
+// 🔘 Действия по кнопкам
+document.querySelectorAll('.cheat-btn[data-action]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    if (action === 'solve') solve();
+    if (action === 'coins') {
+      coins += 100;
+      updateCoinsDisplay();
+      showToast('+100 монет 🤑');
+    }
+    if (action === 'shuffle') {
+      shuffleBoard();
+      updateTilePositions();
+      showToast('🔀 Перемешано');
+    }
+    if (action === 'dark') {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      createTiles(); updateTilePositions();
+    }
+    if (action === 'light') {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      createTiles(); updateTilePositions();
+    }
+    if (action === 'field5') {
+      size = 5;
+      sizeSelector.value = '5';
+      localStorage.setItem("size", size);
+      initGame();
+      showToast('📏 Поле 5x5');
+    }
+    if (action === 'skin') {
+      selectedSkin = '#ff6b6b';
+      localStorage.setItem("skin", selectedSkin);
+      createTiles();
+      updateTilePositions();
+      showToast('🎨 Скин применён бесплатно!');
+    }
+  });
+});
+
+// 🔀 Функция перемешивания без сброса
+function shuffleBoard() {
+  const flat = board.flat().filter(x => x !== 0);
+  shuffle(flat);
+  for (let i = 0; i < size * size - 1; i++) {
+    board[Math.floor(i / size)][i % size] = flat[i];
+  }
+  board[size - 1][size - 1] = 0;
+  emptyPos = { row: size - 1, col: size - 1 };
+}
