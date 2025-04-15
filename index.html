@@ -2,90 +2,83 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Пятнашки</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Подключаем библиотеку конфетти -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Основной скрипт игры -->
+  <script defer src="game.js"></script>
 </head>
 <body>
-  <div id="loader" class="loader">Загрузка...</div>
-
-  <div class="app-container" id="app">
-    <header class="game-header">
+  <div class="container">
+    <div class="sidebar">
       <h1>Пятнашки</h1>
-      <div class="greeting" id="greeting">Привет, игрок!</div>
+      <p class="welcome">Добро пожаловать, игрок!</p>
 
-      <div class="stats-container">
-        <div>Ходы: <span id="moves">0</span></div>
-        <div>Время: <span id="timer">00:00</span></div>
-        <div>💰 <span id="coins">0</span></div>
-      </div>
+      <div class="currency">💰 <span id="currencyCount">0</span></div>
 
-      <div class="button-group">
-        <button id="new-game" class="btn">Новая игра</button>
-        <button id="undo" class="btn">Отменить</button>
-      </div>
+      <button id="newGameBtn">Новая игра</button>
+      <button id="undoBtn">↶ Отменить</button>
 
-      <div class="options-group">
-        <select id="size-selector" class="btn">
+      <div class="dropdown">
+        <select id="sizeSelector">
           <option value="4">Поле 4x4</option>
           <option value="5">Поле 5x5</option>
         </select>
-        <button id="toggle-theme" class="btn">🌙 / ☀️</button>
-        <button id="open-shop" class="btn">🛍️ Магазин</button>
       </div>
-    </header>
 
-    <div id="board" class="tiles-container"></div>
-    <div id="message" class="message-container"></div>
-    <div id="victoryMessage" class="hidden">Поздравляем, вы выиграли!</div>
-  </div>
-
-  <!-- Магазин -->
-  <div id="shop-modal" class="shop-modal hidden">
-    <div class="shop-content">
-      <h2>Магазин блоков</h2>
-      <div class="shop-grid" id="skin-options"></div>
-      <button id="close-shop" class="btn">Закрыть</button>
-    </div>
-  </div>
-
-  <!-- Конфетти -->
-  <canvas id="confetti-canvas"></canvas>
-
-  <!-- Уведомление -->
-  <div id="toast" class="toast hidden">Недостаточно монет 😢</div>
-
-  <!-- 🤖 Кнопка читов -->
-  <div id="dev-button" class="dev-btn">🤖</div>
-
-  <!-- 🔐 Ввод пароля -->
-  <div id="cheat-password" class="modal hidden">
-    <div class="modal-content">
-      <h3>Введите пароль</h3>
-      <input type="password" id="cheat-input" placeholder="Пароль..." />
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button id="cheat-enter" class="btn">Войти</button>
-        <button id="cheat-cancel" class="btn" style="background: #ccc; color: black;">❌</button>
+      <div class="theme-toggle">
+        <label for="themeSwitch">🌙</label>
+        <input type="checkbox" id="themeSwitch">
       </div>
-      <button id="closePasswordModal" class="close-btn">✖</button>
-    </div>
-  </div>
 
-  <!-- 🧠 Меню читов -->
-  <div id="cheat-menu" class="modal hidden">
-    <div class="modal-content">
+      <button id="shopBtn">🛍️ Магазин</button>
+    </div>
+
+    <div class="game-container">
+      <div class="board" id="board"></div>
+      <div class="status">
+        <div>⏱️ <span id="timer">00:00</span></div>
+        <div>Ходов: <span id="moveCount">0</span></div>
+      </div>
+    </div>
+
+    <!-- Чит-кнопка (секретная) -->
+    <button class="cheat-toggle" id="cheatToggle">🤖</button>
+
+    <!-- Модальное окно чит-меню -->
+    <div class="modal" id="cheatModal">
+      <div class="modal-content">
+        <span class="close" id="closeCheat">&times;</span>
+        <h2>Введите пароль</h2>
+        <input type="password" id="cheatPassword" placeholder="Введите пароль">
+        <button id="submitCheat">Войти</button>
+      </div>
+    </div>
+
+    <!-- Полноценное чит-меню -->
+    <div class="cheat-panel hidden" id="cheatPanel">
       <h3>Чит-меню</h3>
-      <button class="btn cheat-btn" data-action="solve">🧠 Автопрохождение</button>
-      <button class="btn cheat-btn" data-action="coins">💰 +100 монет</button>
-      <button class="btn cheat-btn" data-action="shuffle">🔀 Перемешать</button>
-      <button class="btn cheat-btn" data-action="dark">🌑 Тёмная тема</button>
-      <button class="btn cheat-btn" data-action="light">🌞 Светлая тема</button>
-      <button class="btn cheat-btn" data-action="field5">📏 Сделать поле 5x5</button>
-      <button class="btn cheat-btn" data-action="skin">🎨 Применить скин бесплатно</button>
-      <button class="btn cheat-btn" id="close-cheat">❌ Закрыть</button>
+      <button id="autoSolveBtn">🧠 Автопрохождение</button>
+      <button id="addCurrencyBtn">💰 +100 монет</button>
+      <button id="winBtn">🏆 Победа</button>
+      <button id="closeCheatPanel">Закрыть</button>
     </div>
-  </div>
 
-  <script src="game.js"></script>
+    <!-- Модальное окно магазина -->
+    <div class="modal" id="shopModal">
+      <div class="modal-content">
+        <span class="close" id="closeShop">&times;</span>
+        <h2>Магазин блоков</h2>
+        <div class="shop-items" id="shopItems"></div>
+      </div>
+    </div>
+
+    <!-- Контейнер конфетти -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+  </div>
 </body>
 </html>
