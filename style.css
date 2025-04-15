@@ -20,6 +20,11 @@ body.dark {
   padding: 0;
 }
 
+body, html {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background: var(--bg-color);
   color: var(--text-color);
@@ -28,18 +33,18 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 /* ========================= */
 #app {
   display: none;
+  margin: 0 auto;
+  max-width: 480px;
+  width: 100%;
 }
 body.loaded #app {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 480px;
   padding: 20px;
   gap: 10px;
 }
@@ -200,10 +205,10 @@ body.loaded #loader {
 .shop-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.4);
   z-index: 999;
   transition: opacity 0.3s ease;
 }
@@ -220,6 +225,10 @@ body.loaded #loader {
 }
 
 /* ========================= */
+.hidden {
+  display: none !important;
+}
+
 @keyframes popIn {
   from { transform: scale(0.9); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }

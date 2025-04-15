@@ -408,7 +408,7 @@ shopBtn?.addEventListener('click', () => {
 });
 
 closeShopBtn?.addEventListener('click', () => {
-  shopModal.classList.add('hidden');
+  document.getElementById('shop-modal')?.classList.add('hidden');
 });
 
 newGameBtn?.addEventListener('click', initGame);
