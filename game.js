@@ -242,58 +242,27 @@ function checkWin() {
 }
 
 function showVictory() {
+  victoryMessage.classList.remove('hidden');
   stopTimer();
-  soundWin.play().catch(() => {});
-  messageElement.textContent = `🎉 Победа, ${userName}!`;
-  messageElement.style.opacity = '1';
-  coins += 10;
-  updateCoinsDisplay();
-  launchConfetti();
-  localStorage.removeItem("pyatnashki-save");
+  showConfetti();
+
+  setTimeout(() => {
+    stopConfetti(); // конфетти убирается через 3 секунды
+  }, 3000);
 }
 
-// ✅ Конфетти с авто-очисткой
-function launchConfetti() {
+function showConfetti() {
   const canvas = document.getElementById('confetti-canvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width = window.innerWidth;
-  const H = canvas.height = window.innerHeight;
-  const confetti = [];
-
-  for (let i = 0; i < 150; i++) {
-    confetti.push({
-      x: Math.random() * W,
-      y: Math.random() * -H,
-      r: Math.random() * 6 + 4,
-      d: Math.random() * 100,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-      tilt: Math.floor(Math.random() * 10) - 10
-    });
-  }
-
-  let angle = 0;
-  let frame = 0;
-  const maxFrames = 120;
-
-  const interval = setInterval(() => {
-    ctx.clearRect(0, 0, W, H);
-    angle += 0.01;
-    frame++;
-    confetti.forEach(c => {
-      c.y += Math.cos(angle + c.d) + 1 + c.r / 2;
-      c.x += Math.sin(angle) * 2;
-      ctx.beginPath();
-      ctx.fillStyle = c.color;
-      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    if (frame > maxFrames) {
-      clearInterval(interval);
-      ctx.clearRect(0, 0, W, H);
-    }
-  }, 16);
+  canvas.style.display = 'block';
+  confetti.start(canvas);
 }
+
+function stopConfetti() {
+  confetti.stop();
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = 'none';
+}
+
 function undoMove() {
   if (!history.length || isAnimating) return;
   const last = history.pop();
@@ -325,6 +294,12 @@ function solve() {
   setTimeout(() => {
     showVictory();
   }, 300);
+}
+
+function autoSolve() {
+  setTimeout(() => {
+    document.querySelector('.board').style.margin = '0 auto';
+  }, 100);
 }
 
 // Магазин скинов
@@ -421,6 +396,10 @@ cheatCancel?.addEventListener('click', () => {
 
 closeCheat?.addEventListener('click', () => {
   cheatMenu.classList.add('hidden');
+});
+
+document.getElementById("closePasswordModal")?.addEventListener("click", () => {
+  document.getElementById("passwordModal").style.display = "none";
 });
 
 document.querySelectorAll('.cheat-btn[data-action]').forEach(btn => {
