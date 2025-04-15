@@ -236,9 +236,20 @@ function handleTileClick(row, col) {
 function checkWin() {
   const flat = board.flat();
   for (let i = 0; i < flat.length - 1; i++) {
-    if (flat[i] !== i + 1) return false;
+    if (flat[i] !== i + 1) {
+      messageElement.textContent = 'Порядок не соблюден!';
+      messageElement.style.opacity = '1';
+      return false;
+    }
   }
-  return flat[flat.length - 1] === 0;
+  if (flat[flat.length - 1] !== 0) {
+    messageElement.textContent = 'Последний элемент не пустой!';
+    messageElement.style.opacity = '1';
+    return false;
+  }
+  messageElement.textContent = 'Вы выиграли!';
+  messageElement.style.opacity = '1';
+  return true;
 }
 
 function showVictory() {
