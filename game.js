@@ -34,7 +34,6 @@ const shopBtn = document.getElementById('open-shop');
 const shopModal = document.getElementById('shop-modal');
 const skinGrid = document.getElementById('skin-options');
 const closeShopBtn = document.getElementById('close-shop');
-const devBtn = document.getElementById('dev-button');
 
 let board = [];
 let emptyPos = { row: 3, col: 3 };
@@ -109,6 +108,12 @@ function applySavedTheme() {
   }
 }
 
+themeToggle?.addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  createTiles();
+  updateTilePositions();
+});
 function initGame() {
   const total = size * size - 1;
   const numbers = Array.from({ length: total }, (_, i) => i + 1);
@@ -247,16 +252,7 @@ function showVictory() {
   localStorage.removeItem("pyatnashki-save");
 }
 
-function undoMove() {
-  if (!history.length || isAnimating) return;
-  const last = history.pop();
-  board = last.board.map(row => [...row]);
-  emptyPos = { ...last.emptyPos };
-  moves--;
-  movesElement.textContent = moves;
-  updateTilePositions();
-}
-// 🎊 Конфетти по углам
+// ✅ Конфетти с авто-очисткой
 function launchConfetti() {
   const canvas = document.getElementById('confetti-canvas');
   const ctx = canvas.getContext('2d');
@@ -298,8 +294,40 @@ function launchConfetti() {
     }
   }, 16);
 }
+function undoMove() {
+  if (!history.length || isAnimating) return;
+  const last = history.pop();
+  board = last.board.map(row => [...row]);
+  emptyPos = { ...last.emptyPos };
+  moves--;
+  movesElement.textContent = moves;
+  updateTilePositions();
+}
 
-// 🎨 Магазин блоков
+function solve() {
+  board = [];
+  let count = 1;
+  for (let i = 0; i < size; i++) {
+    board[i] = [];
+    for (let j = 0; j < size; j++) {
+      board[i][j] = count++;
+    }
+  }
+  board[size - 1][size - 1] = 0;
+  emptyPos = { row: size - 1, col: size - 1 };
+  history = [];
+  moves = 0;
+  timer = 0;
+  movesElement.textContent = '0';
+  timerElement.textContent = '00:00';
+  createTiles();
+  updateTilePositions();
+  setTimeout(() => {
+    showVictory();
+  }, 300);
+}
+
+// Магазин скинов
 const availableSkins = {
   "default": "var(--tile-color)",
   "#ff6b6b": "#ff6b6b",
@@ -308,17 +336,6 @@ const availableSkins = {
   "#1a535c": "#1a535c",
   "#c084fc": "#c084fc",
 };
-
-function showToast(text) {
-  const toast = document.getElementById('toast');
-  toast.textContent = text;
-  toast.classList.add('show');
-  toast.classList.remove('hidden');
-  setTimeout(() => {
-    toast.classList.remove('show');
-    toast.classList.add('hidden');
-  }, 2000);
-}
 
 function loadSkin() {
   if (!skinGrid) return;
@@ -349,88 +366,45 @@ function loadSkin() {
   });
 }
 
-function solve() {
-  board = [];
-  let count = 1;
-  for (let i = 0; i < size; i++) {
-    board[i] = [];
-    for (let j = 0; j < size; j++) {
-      board[i][j] = count++;
-    }
-  }
-  board[size - 1][size - 1] = 0;
-  emptyPos = { row: size - 1, col: size - 1 };
-  history = [];
-  moves = 0;
-  timer = 0;
-  movesElement.textContent = '0';
-  timerElement.textContent = '00:00';
-  createTiles();
-  updateTilePositions();
+// Toast
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  toast.classList.remove('hidden');
   setTimeout(() => {
-    showVictory();
-  }, 300);
+    toast.classList.remove('show');
+    toast.classList.add('hidden');
+  }, 2000);
 }
 
-// 🔐 Чит-доступ
-devBtn?.addEventListener('click', () => {
-  const input = prompt('Введите пароль для доступа:');
-  if (input === '727666') {
-    if (!document.getElementById('auto-solve')) {
-      const autoBtn = document.createElement('button');
-      autoBtn.id = 'auto-solve';
-      autoBtn.textContent = '🧠 Автопрохождение';
-      document.body.appendChild(autoBtn);
-      autoBtn.addEventListener('click', solve);
-      showToast('🧠 Чит-режим активирован!');
-    }
-  } else {
-    showToast('❌ Неверный пароль');
-  }
-});
-
-// 📦 Подключение кнопок
-themeToggle?.addEventListener('click', () => {
-  const isDark = document.body.classList.toggle('dark');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  createTiles();
-  updateTilePositions();
-});
-
+// Обработчики
+newGameBtn?.addEventListener('click', initGame);
+undoBtn?.addEventListener('click', undoMove);
+shopBtn?.addEventListener('click', () => shopModal.classList.remove('hidden'));
+closeShopBtn?.addEventListener('click', () => shopModal.classList.add('hidden'));
 sizeSelector?.addEventListener('change', () => {
   size = parseInt(sizeSelector.value);
   localStorage.setItem("size", size);
   initGame();
 });
-
-shopBtn?.addEventListener('click', () => {
-  shopModal.classList.remove('hidden');
-});
-
-closeShopBtn?.addEventListener('click', () => {
-  document.getElementById('shop-modal')?.classList.add('hidden');
-});
-
-newGameBtn?.addEventListener('click', initGame);
-undoBtn?.addEventListener('click', undoMove);
 window.addEventListener('beforeunload', saveGame);
-// ========== ЧИТ-МЕНЮ ==========
 
-const cheatBtn = document.getElementById('dev-button');
+// === ЧИТ-МЕНЮ ===
+const devBtn = document.getElementById('dev-button');
 const cheatModal = document.getElementById('cheat-password');
 const cheatInput = document.getElementById('cheat-input');
 const cheatEnter = document.getElementById('cheat-enter');
+const cheatCancel = document.getElementById('cheat-cancel');
 const cheatMenu = document.getElementById('cheat-menu');
 const closeCheat = document.getElementById('close-cheat');
 
-// 🤖 Показать поле ввода пароля
-cheatBtn?.addEventListener('click', () => {
+devBtn?.addEventListener('click', () => {
   cheatModal.classList.remove('hidden');
   cheatInput.value = '';
   cheatInput.focus();
 });
 
-// ✅ Ввод пароля
 cheatEnter?.addEventListener('click', () => {
   if (cheatInput.value === '727666') {
     cheatModal.classList.add('hidden');
@@ -441,12 +415,14 @@ cheatEnter?.addEventListener('click', () => {
   }
 });
 
-// ❌ Закрыть меню
+cheatCancel?.addEventListener('click', () => {
+  cheatModal.classList.add('hidden');
+});
+
 closeCheat?.addEventListener('click', () => {
   cheatMenu.classList.add('hidden');
 });
 
-// 🔘 Действия по кнопкам
 document.querySelectorAll('.cheat-btn[data-action]').forEach(btn => {
   btn.addEventListener('click', () => {
     const action = btn.dataset.action;
@@ -483,12 +459,11 @@ document.querySelectorAll('.cheat-btn[data-action]').forEach(btn => {
       localStorage.setItem("skin", selectedSkin);
       createTiles();
       updateTilePositions();
-      showToast('🎨 Скин применён бесплатно!');
+      showToast('🎨 Скин применён!');
     }
   });
 });
 
-// 🔀 Функция перемешивания без сброса
 function shuffleBoard() {
   const flat = board.flat().filter(x => x !== 0);
   shuffle(flat);

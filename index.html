@@ -54,15 +54,18 @@
   <!-- Уведомление -->
   <div id="toast" class="toast hidden">Недостаточно монет 😢</div>
 
-  <!-- 🤖 Кнопка -->
+  <!-- 🤖 Кнопка читов -->
   <div id="dev-button" class="dev-btn">🤖</div>
 
   <!-- 🔐 Ввод пароля -->
   <div id="cheat-password" class="modal hidden">
     <div class="modal-content">
       <h3>Введите пароль</h3>
-      <input type="password" id="cheat-input" placeholder="Пароль..."/>
-      <button id="cheat-enter" class="btn">Войти</button>
+      <input type="password" id="cheat-input" placeholder="Пароль..." />
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="cheat-enter" class="btn">Войти</button>
+        <button id="cheat-cancel" class="btn" style="background: #ccc; color: black;">❌</button>
+      </div>
     </div>
   </div>
 

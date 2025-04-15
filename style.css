@@ -13,16 +13,16 @@ body.dark {
   --primary-color: #c084fc;
 }
 
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 * {
   box-sizing: border-box;
   user-select: none;
-  margin: 0;
-  padding: 0;
-}
-
-body, html {
-  width: 100%;
-  overflow-x: hidden;
 }
 
 body {
@@ -31,11 +31,18 @@ body {
   font-family: 'Segoe UI', Tahoma, sans-serif;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
+  padding: 20px;
 }
 
-/* ========================= */
+#loader {
+  font-size: 20px;
+  color: var(--primary-color);
+  animation: fadeIn 0.3s ease;
+  text-align: center;
+}
+
 #app {
   display: none;
   margin: 0 auto;
@@ -45,23 +52,41 @@ body {
 body.loaded #app {
   display: flex;
   flex-direction: column;
-  padding: 20px;
   gap: 10px;
 }
 body.loaded #loader {
   display: none;
 }
-.loader {
-  font-size: 20px;
+
+h1 {
+  text-align: center;
   color: var(--primary-color);
-  animation: fadeIn 0.3s ease;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  font-size: 2em;
+  margin-bottom: 10px;
 }
 
-/* ========================= */
+.greeting {
+  text-align: center;
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}
+
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+.button-group,
+.options-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .btn {
   flex: 1;
   padding: 10px;
@@ -77,15 +102,7 @@ body.loaded #loader {
   transform: scale(1.03);
   background: #9165e4;
 }
-.button-group,
-.options-group {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
 
-/* ========================= */
 .tiles-container {
   width: 100%;
   aspect-ratio: 1;
@@ -95,6 +112,7 @@ body.loaded #loader {
   overflow: hidden;
   margin-top: 10px;
 }
+
 .tile {
   position: absolute;
   display: flex;
@@ -120,7 +138,71 @@ body.loaded #loader {
   --scale: 0.96;
 }
 
-/* ========================= */
+.message-container {
+  text-align: center;
+  font-size: 18px;
+  color: var(--win-color);
+  min-height: 24px;
+  transition: opacity 0.3s ease;
+}
+
+/* Магазин */
+.shop-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+.shop-modal.hidden {
+  display: none;
+}
+.shop-content {
+  background: var(--bg-color);
+  color: var(--text-color);
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.2);
+  animation: popIn 0.25s ease;
+}
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.skin-option {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  height: 60px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.3s ease;
+}
+.skin-option:hover {
+  transform: scale(1.05);
+  border-color: var(--primary-color);
+}
+.skin-option.selected {
+  border-color: var(--win-color);
+}
+
+/* Конфетти */
+#confetti-canvas {
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+/* Toast */
 .toast {
   position: fixed;
   top: 20px;
@@ -145,7 +227,7 @@ body.loaded #loader {
   display: none;
 }
 
-/* ========================= */
+/* Чит-кнопка */
 .dev-btn {
   position: fixed;
   bottom: 15px;
@@ -163,7 +245,7 @@ body.loaded #loader {
   opacity: 1;
 }
 
-/* ========================= */
+/* Модальные окна */
 .modal {
   position: fixed;
   inset: 0;
@@ -201,34 +283,7 @@ body.loaded #loader {
   background: var(--win-color);
 }
 
-/* ========================= */
-.shop-modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.4);
-  z-index: 999;
-  transition: opacity 0.3s ease;
-}
-
-.shop-content {
-  background: var(--bg-color);
-  color: var(--text-color);
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.2);
-  animation: popIn 0.25s ease;
-}
-
-/* ========================= */
-.hidden {
-  display: none !important;
-}
-
+/* Анимации */
 @keyframes popIn {
   from { transform: scale(0.9); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
