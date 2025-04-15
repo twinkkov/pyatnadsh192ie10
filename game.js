@@ -34,6 +34,7 @@ const shopBtn = document.getElementById('open-shop');
 const shopModal = document.getElementById('shop-modal');
 const skinGrid = document.getElementById('skin-options');
 const closeShopBtn = document.getElementById('close-shop');
+const victoryMessage = document.getElementById('victoryMessage');
 
 let board = [];
 let emptyPos = { row: 3, col: 3 };
